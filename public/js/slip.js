@@ -5,7 +5,6 @@
  */
 import {
   buildSlipMatrix,
-  KEY_BASKET_IDS,
   buildCorrelations,
   eventsInRange,
 } from "./compare-lib.js";
@@ -284,19 +283,37 @@ function fillSlipCorrelations(matrix, history) {
   );
 }
 
-function bindUniverseToggle(snap, remount) {
+function bindUniverseToggle(_snap, remount) {
   const toggle = $("slipShowAll");
-  if (!toggle || toggle.dataset.bound) return;
-  toggle.dataset.bound = "1";
+  if (!toggle) return;
+  // Rebind on each mount so remount closes over the latest snap (AbortController
+  // drops the previous listener — dataset.bound alone broke after SPA remounts).
+  if (toggle._slipToggleAbort) {
+    try {
+      toggle._slipToggleAbort.abort();
+    } catch {
+      /* ignore */
+    }
+  }
+  const ac = new AbortController();
+  toggle._slipToggleAbort = ac;
   toggle.checked = showAllCurrencies;
-  toggle.addEventListener("change", () => {
-    showAllCurrencies = !!toggle.checked;
-    remount();
-  });
+  toggle.addEventListener(
+    "change",
+    () => {
+      showAllCurrencies = !!toggle.checked;
+      remount();
+    },
+    { signal: ac.signal }
+  );
 }
+
+/** Stale-render guard when toggle remounts while history is still loading. */
+let slipRenderGen = 0;
 
 /** Render Everywhere? · Slip vs USD from snapshot (+ optional history). */
 export async function renderSlip(snap) {
+  const gen = ++slipRenderGen;
   const remount = () => renderSlip(snap);
   bindUniverseToggle(snap, remount);
 
@@ -304,6 +321,7 @@ export async function renderSlip(snap) {
   if (toggle) toggle.checked = showAllCurrencies;
 
   const [histLoaded, evLoaded] = await Promise.all([loadHistory(), loadEvents()]);
+  if (gen !== slipRenderGen) return;
   const history = histLoaded.data;
   const matrix = buildSlipMatrix(snap, history, {
     keyBasketOnly: !showAllCurrencies,
@@ -319,7 +337,7 @@ export async function renderSlip(snap) {
 
   const scope = showAllCurrencies
     ? `full universe (${matrix.rows.length})`
-    : `key basket (${matrix.rows.length} · ${KEY_BASKET_IDS.filter((c) => !["XAU", "BTC", "BRENT", "WTI"].includes(c)).join("/")})`;
+    : `desk+Asia basket (${matrix.rows.length} · ${matrix.currencies.join("/")})`;
 
   setText(
     "slipStatus",

@@ -1037,6 +1037,44 @@ footer.sources {
   height: 100% !important;
 }
 
+/* Compact spark hover tooltip (HTML overlay — LWC labels off in compact mode) */
+.lwc-spark-tip {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--panel2, var(--paper));
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  font: 10px/1.25 JetBrains Mono, IBM Plex Mono, monospace;
+  white-space: nowrap;
+  max-width: calc(100% - 4px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lwc-spark-tip[hidden] { display: none !important; }
+.lwc-spark-tip .tip-date {
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.02em;
+}
+.lwc-spark-tip .tip-val {
+  color: var(--text);
+  font-weight: 600;
+}
+.spark-card .lwc-spark,
+.lwc-spark {
+  overflow: visible;
+}
+.spark-card-slip {
+  overflow: visible;
+}
+
 .spark-label {
   font: 550 0.8rem var(--mono);
   color: var(--text);

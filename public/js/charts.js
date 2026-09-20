@@ -358,6 +358,105 @@ function buildMarkers(dates, events) {
   return markers;
 }
 
+
+/**
+ * Compact HTML tooltip overlay for spark hosts (LWC v5 crosshair has no labels when compact).
+ * @param {HTMLElement} host
+ * @returns {HTMLElement}
+ */
+function ensureSparkTooltip(host) {
+  let tip = host.querySelector(":scope > .lwc-spark-tip");
+  if (!tip) {
+    tip = document.createElement("div");
+    tip.className = "lwc-spark-tip";
+    tip.setAttribute("aria-hidden", "true");
+    tip.hidden = true;
+    host.appendChild(tip);
+  }
+  return tip;
+}
+
+function formatTipTime(time) {
+  if (time == null) return "";
+  if (typeof time === "string") return time.slice(0, 10);
+  if (typeof time === "object" && time.year) {
+    const m = String(time.month).padStart(2, "0");
+    const d = String(time.day).padStart(2, "0");
+    return `${time.year}-${m}-${d}`;
+  }
+  return String(time);
+}
+
+/**
+ * @param {import("../vendor/lightweight-charts.mjs").IChartApi} chart
+ * @param {HTMLElement} host
+ * @param {{ series: object, label?: string }[]} seriesList
+ * @param {{ indexMode?: boolean }} [opts]
+ */
+function attachSparkTooltip(chart, host, seriesList, opts = {}) {
+  const tip = ensureSparkTooltip(host);
+  const indexMode = opts.indexMode !== false;
+
+  chart.subscribeCrosshairMove((param) => {
+    if (
+      !param ||
+      param.time === undefined ||
+      !param.point ||
+      param.point.x < 0 ||
+      param.point.y < 0 ||
+      !host.clientWidth
+    ) {
+      tip.hidden = true;
+      return;
+    }
+
+    const parts = [];
+    for (const { series, label } of seriesList) {
+      if (!series) continue;
+      const d = param.seriesData?.get(series);
+      const v = d && typeof d === "object" ? d.value : undefined;
+      if (v == null || !Number.isFinite(v)) continue;
+      let txt;
+      if (indexMode) {
+        const delta = v - 100;
+        const sign = delta > 0 ? "+" : "";
+        txt = `${v.toFixed(2)} (${sign}${delta.toFixed(2)})`;
+      } else {
+        txt = Number.isFinite(v) ? v.toFixed(v >= 100 ? 2 : 4) : String(v);
+      }
+      parts.push(label ? `${label} ${txt}` : txt);
+    }
+    if (!parts.length) {
+      tip.hidden = true;
+      return;
+    }
+
+    const date = formatTipTime(param.time);
+    tip.replaceChildren();
+    const dEl = document.createElement("span");
+    dEl.className = "tip-date";
+    dEl.textContent = date;
+    const vEl = document.createElement("span");
+    vEl.className = "tip-val";
+    vEl.textContent = parts.join(" · ");
+    tip.appendChild(dEl);
+    tip.appendChild(vEl);
+    tip.hidden = false;
+
+    // Position inside host; flip left if near right edge
+    const tw = tip.offsetWidth || 80;
+    const th = tip.offsetHeight || 28;
+    const maxX = Math.max(0, host.clientWidth - tw - 2);
+    const maxY = Math.max(0, host.clientHeight - th - 2);
+    let x = param.point.x + 10;
+    let y = param.point.y + 8;
+    if (x > maxX) x = Math.max(0, param.point.x - tw - 10);
+    if (y > maxY) y = Math.max(0, param.point.y - th - 6);
+    tip.style.left = `${Math.max(0, Math.min(x, maxX))}px`;
+    tip.style.top = `${Math.max(0, Math.min(y, maxY))}px`;
+  });
+}
+
 /**
  * Draw a relative-index / level spark with Lightweight Charts.
  * @param {HTMLElement} el  div.lwc-spark (or canvas — auto-replaced)
@@ -430,7 +529,8 @@ export function drawSpark(el, values, opts = {}) {
   }
 
   chart.timeScale().fitContent();
-  chartByEl.set(host, { chart });
+  attachSparkTooltip(chart, host, [{ series, label: "" }], { indexMode: true });
+  chartByEl.set(host, { chart, series });
 }
 
 /**
@@ -489,6 +589,7 @@ export function drawSparkWithMA(el, values, opts = {}) {
   });
   price.setData(toLineData(pts, dates, { sparse: true }));
 
+  const tipSeries = [{ series: price, label: "px" }];
   if (opts.ma20?.length) {
     const ma20 = chart.addSeries(LineSeries, {
       color: rgbAlpha(tok.cyanRgb, 0.95),
@@ -499,6 +600,7 @@ export function drawSparkWithMA(el, values, opts = {}) {
       autoscaleInfoProvider: fixedAutoscale(min, max),
     });
     ma20.setData(toLineData(opts.ma20, dates, { sparse: true }));
+    tipSeries.push({ series: ma20, label: "MA20" });
   }
   if (opts.ma50?.length) {
     const ma50 = chart.addSeries(LineSeries, {
@@ -510,8 +612,10 @@ export function drawSparkWithMA(el, values, opts = {}) {
       autoscaleInfoProvider: fixedAutoscale(min, max),
     });
     ma50.setData(toLineData(opts.ma50, dates, { sparse: true }));
+    tipSeries.push({ series: ma50, label: "MA50" });
   }
 
   chart.timeScale().fitContent();
-  chartByEl.set(host, { chart });
+  attachSparkTooltip(chart, host, tipSeries, { indexMode: false });
+  chartByEl.set(host, { chart, series: price });
 }

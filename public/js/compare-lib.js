@@ -45,6 +45,19 @@ export const DESK_FX_BASKET_IDS = [
 /** Pair ids for Desk table order: USDINR, EURINR, … */
 export const DESK_FX_PAIR_IDS = DESK_FX_BASKET_IDS.map((c) => `${c}INR`);
 
+/** Asia peers for Slip default basket (when present in snapshot). */
+export const ASIA_PEER_IDS = ["KRW", "TWD", "IDR", "VND", "THB"];
+
+/**
+ * Default Slip FX universe when “Show all” is unchecked:
+ * Desk FX basket + INR + Asia peers (intersection with snapshot only).
+ */
+export const SLIP_DEFAULT_FX_IDS = [
+  ...DESK_FX_BASKET_IDS,
+  "INR",
+  ...ASIA_PEER_IDS,
+];
+
 const DESK_FX_PAIR_SET = new Set(DESK_FX_PAIR_IDS);
 
 /**
@@ -608,7 +621,15 @@ function oilScoreWith(snap, history, selectedCode) {
 export function filterCurrencyUniverse(codes, keyOnly = false) {
   if (!keyOnly) return codes;
   const set = new Set(codes.map((c) => String(c).toUpperCase()));
-  return KEY_BASKET_IDS.filter((c) => set.has(c) && !KEY_HARD_META[c]);
+  // Desk FX + INR + Asia peers (order preserved); only codes present in snapshot
+  const out = [];
+  const seen = new Set();
+  for (const c of SLIP_DEFAULT_FX_IDS) {
+    if (!set.has(c) || KEY_HARD_META[c] || seen.has(c)) continue;
+    out.push(c);
+    seen.add(c);
+  }
+  return out;
 }
 
 /**
