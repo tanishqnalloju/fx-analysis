@@ -12,6 +12,12 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchTreasuryYields } from "../src/yields.js";
+import {
+  fetchYahooHardAssets,
+  fetchCryptoIndexProxy,
+  mergeHardHistorySeries,
+  pctChange as hardPctChange,
+} from "../src/hardAssets.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const snapPath = join(root, "public/data/snapshot.json");
@@ -22,7 +28,7 @@ const FLOAT_URL = "https://www.floatrates.com/daily/usd.json";
 const COINBASE_BTC = "https://api.coinbase.com/v2/prices/BTC-USD/spot";
 const HISTORY_DAYS = 40; // ~30-45 calendar days → ~25-30 ECB business days
 
-const HARD_IDS = ["XAU", "BRENT", "WTI", "BTC"];
+const HARD_IDS = ["XAU", "BRENT", "WTI", "BTC", "COPPER", "WHEAT", "NATGAS", "CRYPTO_INDEX"];
 
 function isoDateUTC(d = new Date()) {
   return d.toISOString().slice(0, 10);
@@ -93,6 +99,21 @@ function loadPriorSnapshot() {
   } catch {
     return null;
   }
+}
+
+function loadPriorHistory() {
+  if (!existsSync(histPath)) return { series: {}, hardAssets: {} };
+  try {
+    return JSON.parse(readFileSync(histPath, "utf8"));
+  } catch {
+    return { series: {}, hardAssets: {} };
+  }
+}
+
+function daysAgoLocal(n) {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - n);
+  return d.toISOString().slice(0, 10);
 }
 
 function pctChange(prev, next) {
@@ -230,10 +251,12 @@ async function main() {
     console.warn(`  floatrates failed: ${e.message || e}`);
   }
 
-  // Hard assets: keep gold/oil from prior snapshot (no invent); refresh BTC via Coinbase
+  // Hard assets: gold/oil prior; BTC Coinbase; Yahoo HG/ZW/NG; BTC+ETH proxy
+  const priorHist = loadPriorHistory();
   const priorHard = new Map(
     (prior?.hardAssets || []).map((h) => [String(h.id || "").toUpperCase(), h])
   );
+  const hardHistory = { ...(priorHist?.hardAssets || {}) };
 
   let btcUsd = priorHard.get("BTC")?.usdPrice ?? null;
   let btcChg = priorHard.get("BTC")?.changePct ?? null;
@@ -248,12 +271,51 @@ async function main() {
       }
       btcUsd = amt;
       btcSource = `Coinbase spot BTC-USD (${new Date().toISOString()})`;
+      hardHistory.BTC = mergeHardHistorySeries(
+        hardHistory.BTC,
+        [{ t: asOfDate, v: Number(amt.toFixed(2)) }],
+        { cutoffDate: daysAgoLocal(HISTORY_DAYS + 15) }
+      );
     } else {
       skipped.push({ code: "BTC", reason: "coinbase amount invalid; kept prior" });
     }
   } catch (e) {
     skipped.push({ code: "BTC", reason: `coinbase failed: ${e.message || e}; kept prior` });
     console.warn(`  coinbase failed: ${e.message || e}`);
+  }
+
+  console.log("refresh: fetching Yahoo HG=F / ZW=F / NG=F…");
+  const yahooPack = await fetchYahooHardAssets({
+    range: "3mo",
+    userAgent: "fx-analysis-refresh/1.5",
+  });
+  for (const n of yahooPack.notes) notes.push(n);
+  for (const s of yahooPack.skipped) skipped.push(s);
+  const yahooById = new Map(yahooPack.assets.map((a) => [a.id, a]));
+  for (const a of yahooPack.assets) {
+    hardHistory[a.id] = mergeHardHistorySeries(hardHistory[a.id], a.history, {
+      cutoffDate: daysAgoLocal(HISTORY_DAYS + 15),
+    });
+    console.log(`  ${a.id}=${a.usdPrice} ${a.unit} (Yahoo ${a.symbol})`);
+  }
+
+  console.log("refresh: fetching Coinbase ETH for CRYPTO_INDEX proxy…");
+  const cryptoPack = await fetchCryptoIndexProxy({
+    userAgent: "fx-analysis-refresh/1.5",
+  });
+  for (const n of cryptoPack.notes) notes.push(n);
+  for (const s of cryptoPack.skipped) skipped.push(s);
+  if (cryptoPack.asset) {
+    const prevIdx = priorHard.get("CRYPTO_INDEX")?.usdPrice;
+    if (typeof prevIdx === "number" && prevIdx > 0) {
+      cryptoPack.asset.changePct = hardPctChange(prevIdx, cryptoPack.asset.usdPrice);
+    }
+    hardHistory.CRYPTO_INDEX = mergeHardHistorySeries(
+      hardHistory.CRYPTO_INDEX,
+      [{ t: asOfDate, v: cryptoPack.asset.usdPrice }],
+      { cutoffDate: daysAgoLocal(HISTORY_DAYS + 15) }
+    );
+    console.log(`  CRYPTO_INDEX=${cryptoPack.asset.usdPrice} (BTC+ETH eq-wt)`);
   }
 
   const hardAssets = [];
@@ -271,6 +333,34 @@ async function main() {
         inrPrice: Number((btcUsd * usdInr).toFixed(2)),
         changePct: btcChg,
         source: btcSource,
+      });
+      continue;
+    }
+    if (yahooById.has(id)) {
+      const a = yahooById.get(id);
+      hardAssets.push({
+        id: a.id,
+        name: a.name,
+        unit: a.unit,
+        usdPrice: a.usdPrice,
+        inrPrice: Number((a.usdPrice * usdInr).toFixed(4)),
+        changePct: a.changePct,
+        source: `${a.source} · INR = USD × USDINR ${usdInr} (Frankfurter ${asOfDate})`,
+      });
+      continue;
+    }
+    if (id === "CRYPTO_INDEX") {
+      if (!cryptoPack.asset) continue;
+      const a = cryptoPack.asset;
+      hardAssets.push({
+        id: a.id,
+        name: a.name,
+        unit: a.unit,
+        usdPrice: a.usdPrice,
+        inrPrice: Number((a.usdPrice * usdInr).toFixed(2)),
+        changePct: a.changePct,
+        source: `${a.source} · INR = USD × USDINR ${usdInr}`,
+        components: { btcUsd: a.btcUsd, ethUsd: a.ethUsd },
       });
       continue;
     }
@@ -295,7 +385,7 @@ async function main() {
     });
   }
 
-  // US Treasury yields (never invent)
+    // US Treasury yields (never invent)
   console.log("refresh: fetching U.S. Treasury yield curve CSV…");
   let yields = {
     asOf: null,
@@ -471,11 +561,14 @@ async function main() {
     to: days[days.length - 1] || end,
     dayCount: days.length,
     series,
-    // Intentionally omit hardAssets history — do not invent
-    hardAssets: {},
+    hardAssets: Object.fromEntries(
+      Object.entries(hardHistory).filter(([, arr]) => Array.isArray(arr) && arr.length >= 2)
+    ),
     notes: [
       "FX series are INR per 1 foreign (e.g. USDINR, EURINR) from ECB/Frankfurter USD crosses.",
-      "Hard-asset history not present — charts must say level only / no history yet.",
+      Object.keys(hardHistory).filter((k) => hardHistory[k]?.length).length
+        ? `Hard-asset daily history (USD): ${Object.keys(hardHistory).filter((k) => hardHistory[k]?.length).join(", ")}.`
+        : "Hard-asset history not present — charts must say level only / no history yet.",
       series.US10Y?.length
         ? `US2Y/US10Y appended from Treasury CSV (${series.US10Y.length} points).`
         : "US Treasury yield history not present this run.",

@@ -128,9 +128,12 @@ function fillHardTable(hard) {
   if (!body) return;
   body.innerHTML = "";
   // Prefer gold/oil first; include BTC in table only
-  const order = ["XAU", "BRENT", "WTI", "BTC"];
+  const order = ["XAU", "BRENT", "WTI", "BTC", "COPPER", "WHEAT", "NATGAS", "CRYPTO_INDEX"];
   const byId = new Map((hard || []).map((h) => [String(h.id || "").toUpperCase(), h]));
-  const rows = order.map((id) => byId.get(id)).filter(Boolean);
+  const rows = [
+    ...order.map((id) => byId.get(id)).filter(Boolean),
+    ...[...byId.values()].filter((h) => !order.includes(String(h.id || "").toUpperCase())),
+  ];
   if (!rows.length) {
     body.innerHTML = `<tr><td colspan="5" class="muted">No hard-asset rows in snapshot</td></tr>`;
     return;

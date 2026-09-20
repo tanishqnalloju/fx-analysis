@@ -8,6 +8,12 @@
  */
 
 import { fetchTreasuryYields } from "./yields.js";
+import {
+  fetchYahooHardAssets,
+  fetchCryptoIndexProxy,
+  mergeHardHistorySeries,
+  pctChange as hardPctChange,
+} from "./hardAssets.js";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -18,7 +24,7 @@ const cors = {
 const FRANK_BASE = "https://api.frankfurter.app";
 const FLOAT_URL = "https://www.floatrates.com/daily/usd.json";
 const COINBASE_BTC = "https://api.coinbase.com/v2/prices/BTC-USD/spot";
-const HARD_IDS = ["XAU", "BRENT", "WTI", "BTC"];
+const HARD_IDS = ["XAU", "BRENT", "WTI", "BTC", "COPPER", "WHEAT", "NATGAS", "CRYPTO_INDEX"];
 const HISTORY_DAYS = 40;
 const KV_KEYS = { snapshot: "snapshot", history: "history", meta: "meta" };
 
@@ -548,6 +554,10 @@ function buildCompare(snap, codeRaw) {
     ["BTC", "hard", "Bitcoin", "BTC"],
     ["BRENT", "hard", "Brent crude", "bbl"],
     ["WTI", "hard", "WTI crude", "bbl"],
+    ["COPPER", "hard", "Copper", "lb"],
+    ["WHEAT", "hard", "Wheat", "bu"],
+    ["NATGAS", "hard", "Natgas", "MMBtu"],
+    ["CRYPTO_INDEX", "hard", "BTC+ETH proxy", "idx"],
   ];
   for (const row of KEY_BASKET) {
     const [code, kind, label, unit] = row;
@@ -849,10 +859,11 @@ export async function refreshAndStore(env, { request = null } = {}) {
     skipped.push({ code: "FLOATRATES", reason: String(e.message || e) });
   }
 
-  // Hard assets: keep gold/oil from prior; refresh BTC via Coinbase — never invent
+  // Hard assets: gold/oil from prior; BTC Coinbase; Yahoo HG/ZW/NG; BTC+ETH proxy
   const priorHard = new Map(
     (prior?.hardAssets || []).map((h) => [String(h.id || "").toUpperCase(), h])
   );
+  const hardHistory = { ...(priorHistory?.hardAssets || {}) };
 
   let btcUsd = priorHard.get("BTC")?.usdPrice ?? null;
   let btcChg = priorHard.get("BTC")?.changePct ?? null;
@@ -866,6 +877,11 @@ export async function refreshAndStore(env, { request = null } = {}) {
       }
       btcUsd = amt;
       btcSource = `Coinbase spot BTC-USD (${new Date().toISOString()})`;
+      hardHistory.BTC = mergeHardHistorySeries(
+        hardHistory.BTC,
+        [{ t: asOfDate, v: Number(amt.toFixed(2)) }],
+        { cutoffDate: daysAgo(HISTORY_DAYS + 15) }
+      );
     } else {
       skipped.push({ code: "BTC", reason: "coinbase amount invalid; kept prior" });
     }
@@ -874,6 +890,38 @@ export async function refreshAndStore(env, { request = null } = {}) {
       code: "BTC",
       reason: `coinbase failed: ${e.message || e}; kept prior`,
     });
+  }
+
+  // Yahoo COMEX/CBOT/NYMEX futures — real sourced prints only
+  const yahooPack = await fetchYahooHardAssets({
+    range: "3mo",
+    userAgent: "fx-analysis-worker/1.5",
+  });
+  for (const n of yahooPack.notes) notes.push(n);
+  for (const s of yahooPack.skipped) skipped.push(s);
+  const yahooById = new Map(yahooPack.assets.map((a) => [a.id, a]));
+  for (const a of yahooPack.assets) {
+    hardHistory[a.id] = mergeHardHistorySeries(hardHistory[a.id], a.history, {
+      cutoffDate: daysAgo(HISTORY_DAYS + 15),
+    });
+  }
+
+  // BTC+ETH equal-weight spot proxy (honest label)
+  const cryptoPack = await fetchCryptoIndexProxy({
+    userAgent: "fx-analysis-worker/1.5",
+  });
+  for (const n of cryptoPack.notes) notes.push(n);
+  for (const s of cryptoPack.skipped) skipped.push(s);
+  if (cryptoPack.asset) {
+    const prevIdx = priorHard.get("CRYPTO_INDEX")?.usdPrice;
+    if (typeof prevIdx === "number" && prevIdx > 0) {
+      cryptoPack.asset.changePct = hardPctChange(prevIdx, cryptoPack.asset.usdPrice);
+    }
+    hardHistory.CRYPTO_INDEX = mergeHardHistorySeries(
+      hardHistory.CRYPTO_INDEX,
+      [{ t: asOfDate, v: cryptoPack.asset.usdPrice }],
+      { cutoffDate: daysAgo(HISTORY_DAYS + 15) }
+    );
   }
 
   const hardAssets = [];
@@ -894,6 +942,35 @@ export async function refreshAndStore(env, { request = null } = {}) {
       });
       continue;
     }
+    if (yahooById.has(id)) {
+      const a = yahooById.get(id);
+      hardAssets.push({
+        id: a.id,
+        name: a.name,
+        unit: a.unit,
+        usdPrice: a.usdPrice,
+        inrPrice: Number((a.usdPrice * usdInr).toFixed(4)),
+        changePct: a.changePct,
+        source: `${a.source} · INR = USD × USDINR ${usdInr} (Frankfurter ${asOfDate})`,
+      });
+      continue;
+    }
+    if (id === "CRYPTO_INDEX") {
+      if (!cryptoPack.asset) continue;
+      const a = cryptoPack.asset;
+      hardAssets.push({
+        id: a.id,
+        name: a.name,
+        unit: a.unit,
+        usdPrice: a.usdPrice,
+        inrPrice: Number((a.usdPrice * usdInr).toFixed(2)),
+        changePct: a.changePct,
+        source: `${a.source} · INR = USD × USDINR ${usdInr}`,
+        components: { btcUsd: a.btcUsd, ethUsd: a.ethUsd },
+      });
+      continue;
+    }
+    // XAU / BRENT / WTI — carry prior USD print; never invent
     const prev = priorHard.get(id);
     if (!prev || !(typeof prev.usdPrice === "number" && prev.usdPrice > 0)) {
       skipped.push({
@@ -915,7 +992,7 @@ export async function refreshAndStore(env, { request = null } = {}) {
     });
   }
 
-  // US Treasury yields (scheduled refresh — never invent)
+    // US Treasury yields (scheduled refresh — never invent)
   let yields = {
     asOf: null,
     us2y: null,
@@ -1018,6 +1095,18 @@ export async function refreshAndStore(env, { request = null } = {}) {
       ? `Brent ${brent.usdPrice} / WTI ${hardAssets.find((h) => h.id === "WTI")?.usdPrice ?? "—"} USD/bbl — prior retained; INR recomputed`
       : "Oil: not fetched this run",
     btc ? `BTC ${btc.usdPrice} USD — ${btcSource}` : "BTC: unavailable",
+    hardAssets.find((h) => h.id === "COPPER")
+      ? `Copper ${hardAssets.find((h) => h.id === "COPPER").usdPrice} USD/lb — Yahoo HG=F`
+      : "Copper: Yahoo HG=F not in this run",
+    hardAssets.find((h) => h.id === "WHEAT")
+      ? `Wheat ${hardAssets.find((h) => h.id === "WHEAT").usdPrice} USD/bu — Yahoo ZW=F (USc→USD)`
+      : "Wheat: Yahoo ZW=F not in this run",
+    hardAssets.find((h) => h.id === "NATGAS")
+      ? `Natgas ${hardAssets.find((h) => h.id === "NATGAS").usdPrice} USD/MMBtu — Yahoo NG=F`
+      : "Natgas: Yahoo NG=F not in this run",
+    hardAssets.find((h) => h.id === "CRYPTO_INDEX")
+      ? `CRYPTO_INDEX ${hardAssets.find((h) => h.id === "CRYPTO_INDEX").usdPrice} USD — Coinbase BTC+ETH eq-wt proxy`
+      : "CRYPTO_INDEX: Coinbase proxy not in this run",
     "Worker cron refresh stores snapshot/history/meta in KV; bot redeploy optional",
     yields.us10y != null
       ? `UST yields 2y ${yields.us2y}% / 10y ${yields.us10y}% / curve ${yields.us10yMinus2y}% as-of ${yields.asOf}`
@@ -1027,7 +1116,7 @@ export async function refreshAndStore(env, { request = null } = {}) {
   const assumptions = [
     "Prefer Frankfurter/ECB when a code exists in both Frankfurter and FloatRates",
     "FloatRates extras are labeled notOnEcb — never treated as ECB reference",
-    "Hard-asset multi-day history is not invented; gold/oil USD prints carried from prior KV",
+    "Hard-asset multi-day history is not invented; gold/oil USD prints carried from prior KV; copper/wheat/natgas from Yahoo HG=F/ZW=F/NG=F when fetch succeeds; CRYPTO_INDEX = Coinbase BTC+ETH equal-weight spot proxy",
     "changePct for Frankfurter pairs is prior ECB business day → latest",
     "realStrength is narrative desk commentary, not a formal PPP or REER index",
     "Higher USDINR / XXXINR means weaker INR in FX terms",
@@ -1069,17 +1158,28 @@ export async function refreshAndStore(env, { request = null } = {}) {
     },
   };
 
+  // Validate rule: omit single-point hard series (do not invent multi-day)
+  for (const k of Object.keys(hardHistory)) {
+    if (!Array.isArray(hardHistory[k]) || hardHistory[k].length < 2) {
+      delete hardHistory[k];
+    }
+  }
+  const hardHistKeys = Object.keys(hardHistory).filter(
+    (k) => Array.isArray(hardHistory[k]) && hardHistory[k].length
+  );
   const history = {
     asOf,
-    source: "Frankfurter / ECB",
+    source: "Frankfurter / ECB + Yahoo/Coinbase hard prints when fetched",
     from: histFrom,
     to: histTo,
     dayCount: seriesDayCount,
     series,
-    hardAssets: {},
+    hardAssets: hardHistory,
     notes: [
       "FX series are INR per 1 foreign from ECB/Frankfurter USD crosses.",
-      "Hard-asset history not present — charts must say level only / no history yet.",
+      hardHistKeys.length
+        ? `Hard-asset daily history (USD): ${hardHistKeys.join(", ")} — Yahoo futures and/or Coinbase spots; never invented.`
+        : "Hard-asset history not present — charts must say level only / no history yet.",
       series.US10Y?.length
         ? `US2Y/US10Y from Treasury CSV (${series.US10Y.length} points).`
         : "US Treasury yield history not present this run.",

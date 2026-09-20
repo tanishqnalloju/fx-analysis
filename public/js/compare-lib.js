@@ -18,6 +18,10 @@ export const KEY_BASKET_IDS = [
   "BTC",
   "BRENT",
   "WTI",
+  "COPPER",
+  "WHEAT",
+  "NATGAS",
+  "CRYPTO_INDEX",
 ];
 
 /**
@@ -108,6 +112,10 @@ const KEY_HARD_META = {
   BTC: { label: "Bitcoin", unit: "BTC" },
   BRENT: { label: "Brent crude", unit: "bbl" },
   WTI: { label: "WTI crude", unit: "bbl" },
+  COPPER: { label: "Copper", unit: "lb" },
+  WHEAT: { label: "Wheat", unit: "bu" },
+  NATGAS: { label: "Natgas", unit: "MMBtu" },
+  CRYPTO_INDEX: { label: "BTC+ETH proxy", unit: "idx" },
 };
 
 /** @param {string} code */
@@ -982,7 +990,7 @@ export function buildCorrelations(history, codeRaw, opts = {}) {
     corrVs(
       "gold",
       Array.isArray(goldHist) && goldHist.length >= 2 ? goldHist : null,
-      "gold history absent — level only / not invented"
+      "no hard-asset history"
     )
   );
 
@@ -992,7 +1000,7 @@ export function buildCorrelations(history, codeRaw, opts = {}) {
   if (Array.isArray(brent) && brent.length >= 2) oil = brent;
   else if (Array.isArray(wti) && wti.length >= 2) oil = wti;
   rows.push(
-    corrVs("oil", oil, "oil history absent — level only / not invented")
+    corrVs("oil", oil, "no hard-asset history")
   );
 
   const scored = rows.filter((r) => r.corr != null);

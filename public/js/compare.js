@@ -19,6 +19,7 @@ import {
   formatNum,
   formatPct,
   chgClass,
+  strengthClass,
   setText,
   loadCompare,
   loadHistory,
@@ -216,11 +217,16 @@ function fillRanking(ranking) {
               (r.score || 0) >= 0 ? "left:50%" : `right:50%;left:auto`
             }"></div>
           </div>
-          <div class="rank-score mono ${chgClass(r.score)}">${escapeHtml(formatPct(r.score))}</div>
+          <div class="rank-score mono ${strengthClass(r.score)}">${escapeHtml(formatPct(r.score))}</div>
         `;
         list.appendChild(row);
       }
     }
+  }
+  const legend = $("cmpRankLegend");
+  if (legend) {
+    legend.textContent =
+      "Green = stronger vs that leg · Red = weaker · (FX level Δ% still uses higher-INR-per-1 = red)";
   }
   drawRankCanvas(ranking);
 }
@@ -260,7 +266,7 @@ function fillCorrelations(corr) {
       row.corr == null ? 0 : Math.round(Math.abs(row.corr) * 80);
     tr.innerHTML = `
       <td>${escapeHtml(row.label || row.id)}</td>
-      <td class="mono ${row.corr == null ? "muted" : chgClass(row.corr)}">${escapeHtml(rho)}${
+      <td class="mono ${row.corr == null ? "muted" : ""}">${escapeHtml(rho)}${
         barW
           ? `<span class="corr-bar" style="width:${barW}px;opacity:${0.35 + Math.abs(row.corr || 0) * 0.65}"></span>`
           : ""
@@ -426,16 +432,30 @@ function renderHistoryCharts(data, history, calendar) {
 
   const hardIds = new Set(["XAU", "BTC", "BRENT", "WTI"]);
   if (data.kind === "hard" || hardIds.has(code)) {
-    if (note) {
-      note.textContent = `${code}: level only / no history yet (hard-asset history not invented).`;
+    const ha = history?.hardAssets?.[code];
+    if (Array.isArray(ha) && ha.length >= 2) {
+      // fall through using level index of hard USD series vs basket — rare
+    } else {
+      if (note) {
+        note.textContent =
+          code === "XAU" || code === "GOLD"
+            ? "Gold: snapshot level only — no daily history series yet (not invented)."
+            : `${code}: snapshot level only — no daily history series yet (not invented).`;
+      }
+      host.innerHTML = `<div class="spark-empty muted">${escapeHtml(
+        code === "XAU"
+          ? "Gold: snapshot level only — no daily history series yet (not invented)."
+          : `${code}: no daily history series yet (not invented).`
+      )}</div>`;
+      return;
     }
-    host.innerHTML = `<div class="spark-empty muted">level only / no history yet</div>`;
-    return;
   }
 
   if (!selSeries || selSeries.length < 2) {
-    if (note) note.textContent = `No Frankfurter history for ${code} yet.`;
-    host.innerHTML = `<div class="spark-empty muted">no history for ${escapeHtml(code)}</div>`;
+    if (note) {
+      note.textContent = `History vs basket legs unavailable for ${code}: no Frankfurter series (or too short). Not invented.`;
+    }
+    host.innerHTML = `<div class="spark-empty muted">No series for ${escapeHtml(code)} — cannot build vs-basket sparks.</div>`;
     return;
   }
 
@@ -469,7 +489,12 @@ function renderHistoryCharts(data, history, calendar) {
   const band = sharedIndexBand(seriesList);
 
   if (note) {
-    note.textContent = `Lightweight Charts · relative index (start=100), fixed y-band ±${band.half.toFixed(1)} so spikes don’t dominate: ${code} vs key-basket legs · ${history.from || ""}→${history.to || ""} · ${history.dayCount || selSeries.length} days · gold history still missing · markers: ${calendar?.label || "none"}`;
+    const goldHist = history?.hardAssets?.XAU;
+    const goldBit =
+      Array.isArray(goldHist) && goldHist.length >= 2
+        ? "gold daily history present"
+        : "Gold pane blank until gold daily history exists";
+    note.textContent = `Each spark = relative index of that FX vs USD (start=100). End badge = change from 100. ${code} vs key-basket legs · y-band ±${band.half.toFixed(1)} · ${history.from || ""}→${history.to || ""} · ${goldBit}.`;
   }
 
   for (const { legId, values, dates, emptyMsg } of prepared) {
@@ -489,7 +514,7 @@ function renderHistoryCharts(data, history, calendar) {
       }
     }
     const deltaHtml = endDelta
-      ? `<span class="spark-delta ${chgClass(endNum)}">${escapeHtml(endDelta)}</span>`
+      ? `<span class="spark-delta ${strengthClass(endNum)}">${escapeHtml(endDelta)}</span>`
       : "";
 
     card.innerHTML = `<div class="spark-label">${escapeHtml(code)}/${escapeHtml(legId)}${deltaHtml}</div>`;
@@ -610,8 +635,18 @@ function fillLeadLag(ll) {
   const body = $("cmpLeadBody");
   if (!head || !body) return;
   const lags = ll?.lags || [];
-  head.innerHTML = `<tr><th>Series</th>${lags
-    .map((k) => `<th class="mono">${k}</th>`)
+  const headers =
+    ll?.lagHeaders?.length === lags.length
+      ? ll.lagHeaders
+      : lags.map((k) => ({
+          lag: k,
+          label: k === 0 ? "0 · same day" : k < 0 ? `lead ${-k}d` : `lag ${k}d`,
+        }));
+  head.innerHTML = `<tr><th>Series</th>${headers
+    .map(
+      (h) =>
+        `<th class="mono leadlag-h" title="lag ${h.lag}">${escapeHtml(h.label)}</th>`
+    )
     .join("")}<th>Role</th></tr>`;
   body.innerHTML = "";
   if (!ll?.rows?.length) {
@@ -625,7 +660,8 @@ function fillLeadLag(ll) {
         .map((k) => {
           const c = row.cells?.[k];
           const txt = c == null ? "—" : c.toFixed(2);
-          const cls = c == null ? "muted" : chgClass(c);
+          // corr magnitude: keep neutral muted / text — not FX-level chgClass
+          const cls = c == null ? "muted" : "";
           const hi = row.bestLag === k && c != null ? " lead-best" : "";
           return `<td class="mono ${cls}${hi}">${escapeHtml(txt)}</td>`;
         })
@@ -638,9 +674,14 @@ function fillLeadLag(ll) {
       body.appendChild(tr);
     }
   }
-  const bits = [ll?.note || ""];
+  const bits = [
+    "Columns are day lags of the other series vs selected: −5 = other leads by 5 sessions, 0 = same day, +5 = other lags by 5.",
+  ];
+  if (ll?.windowFrom && ll?.windowTo) {
+    bits.push(`History window ${ll.windowFrom}→${ll.windowTo}.`);
+  }
   if (ll?.hardAssetNote) bits.push(ll.hardAssetNote);
-  setText("cmpLeadNote", bits.filter(Boolean).join(" · "));
+  setText("cmpLeadNote", bits.filter(Boolean).join(" "));
   setText("cmpLeadMethod", ll?.method || "");
 }
 

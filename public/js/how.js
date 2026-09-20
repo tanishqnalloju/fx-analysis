@@ -23,7 +23,7 @@ export async function renderHow(snap) {
 
   setText(
     "howSourcesLead",
-    "Prefer Frankfurter/ECB. FloatRates fills codes absent from ECB and may lag. US Treasury 2y/10y from the daily CSV when fetch succeeds. Gold/oil USD prints are carried from the prior validated snapshot — never invented. Multi-day hard-asset history is omitted until a sourced feed exists (REER/NEER panel stays hidden for the same reason)."
+    "Prefer Frankfurter/ECB. FloatRates fills codes absent from ECB and may lag. US Treasury 2y/10y from the daily CSV when fetch succeeds. Gold/oil USD prints are carried from the prior validated snapshot — never invented. Copper (Yahoo HG=F COMEX), wheat (Yahoo ZW=F CBOT, USc→USD/bu), and natgas (Yahoo NG=F NYMEX) are fetched when the Yahoo chart API succeeds; omitted on failure. CRYPTO_INDEX is an honest Coinbase BTC+ETH equal-weight spot proxy (not a published Bloomberg-style index). Multi-day hard history is stored only from those sourced feeds (REER/NEER panel stays hidden)."
   );
 
   const list = $("howAssumptions");

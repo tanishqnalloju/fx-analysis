@@ -332,6 +332,9 @@
             Session cross Δ ≈ Δ selected − Δ leg. Positive = selected strengthened vs that leg.
             Bars normalized to max |score| (−1…+1). Key basket only.
           </p>
+          <p class="chart-caption caption-tight score-legend" id="cmpRankLegend">
+            Green = stronger vs that leg · Red = weaker · (FX level Δ% still uses higher-INR-per-1 = red)
+          </p>
           <div class="rank-bars" id="cmpRankBars"></div>
           <div class="chart-wrap chart-wrap-sm" style="margin-top:10px">
             <canvas id="cmpRankCanvas" width="900" height="200" aria-label="Relative strength ranking bars"></canvas>
@@ -363,7 +366,7 @@
 
         <section class="panel">
           <h2>History vs basket legs</h2>
-          <p class="chart-caption" id="cmpSparkNote" style="margin-bottom:8px">Lightweight Charts · relative index sparks when Frankfurter history is present.</p>
+          <p class="chart-caption" id="cmpSparkNote" style="margin-bottom:8px">Each spark = relative index of that FX vs USD (start=100). End badge = change from 100. Gold pane blank until gold daily history exists.</p>
           <div class="spark-grid" id="cmpSparkGrid"></div>
           <div class="event-legend" id="cmpEventLegend"></div>
         </section>
@@ -380,7 +383,7 @@
 
         <section class="panel">
           <h2>Lead-lag <span class="h2-meta">who leads</span></h2>
-          <p class="chart-caption caption-tight" id="cmpLeadNote">corr(USDINR_t, other_t+k) for k ∈ [−5,+5].</p>
+          <p class="chart-caption caption-tight" id="cmpLeadNote">Columns are day lags of the other series vs selected: −5 = other leads by 5 sessions, 0 = same day, +5 = other lags by 5.</p>
           <div class="table-wrap table-wrap-scroll">
             <table class="desk-table leadlag-table" id="cmpLeadTable">
               <thead id="cmpLeadHead"></thead>
@@ -422,6 +425,9 @@
           Uses multi-day Frankfurter history when present; otherwise session Δ.
           Hard-asset history is never invented.
         </p>
+        <p class="chart-caption caption-tight score-legend" id="slipScoreLegend">
+          Green = stronger vs that leg · Red = weaker · (FX level Δ% still uses higher-INR-per-1 = red)
+        </p>
         <div class="table-wrap table-wrap-scroll">
           <table class="desk-table slip-table" id="slipMatrix">
             <thead></thead>
@@ -452,7 +458,7 @@
 
       <section class="panel">
         <h2>Sparks vs USD / gold</h2>
-        <p class="chart-caption" id="slipSparkNote" style="margin-bottom:8px">Lightweight Charts · per-currency history sparks when available.</p>
+        <p class="chart-caption" id="slipSparkNote" style="margin-bottom:8px">Each spark = relative index of that FX vs USD (start=100). End badge = change from 100. Gold pane blank until gold daily history exists.</p>
         <div class="spark-grid spark-grid-slip" id="slipSparkGrid"></div>
         <div class="event-legend" id="slipEventLegend"></div>
       </section>

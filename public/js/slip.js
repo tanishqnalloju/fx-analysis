@@ -13,6 +13,7 @@ import {
   escapeHtml,
   formatPct,
   chgClass,
+  strengthClass,
   setText,
   loadHistory,
   loadEvents,
@@ -32,8 +33,9 @@ let showAllCurrencies = false;
 
 function cellClass(score) {
   if (score == null || !Number.isFinite(score)) return "slip-na";
-  if (score <= -0.05) return "slip-soft";
-  if (score >= 0.05) return "slip-hard";
+  // + = strengthened vs leg → strong/green; − = weakened → weak/red
+  if (score <= -0.05) return "slip-weak";
+  if (score >= 0.05) return "slip-strong";
   return "slip-flat";
 }
 
@@ -96,20 +98,21 @@ function renderLadders(matrix) {
   const host = $("slipLadders");
   if (!host) return;
   host.innerHTML = "";
+  // vs-gold ladder omitted entirely (XAU.changePct null + no gold daily history).
+  // Only show legs that have scored entries (usd/peers/oil/btc when available).
   for (const leg of matrix.legs) {
+    if (leg.id === "gold") continue;
     const ladder = matrix.ladders[leg.id] || [];
+    if (!ladder.length) continue;
     const card = document.createElement("div");
     card.className = "slip-ladder-card";
     let body = `<div class="slip-ladder-title">${escapeHtml(leg.label)}</div>`;
-    if (!ladder.length) {
-      body += `<div class="muted">No scores for this leg</div>`;
-    } else {
-      body += `<ol class="slip-ladder-list">`;
-      const show = ladder.slice(0, showAllCurrencies ? 20 : 12);
-      for (const e of show) {
-        const pct = Math.round(Math.abs(e.normalized || 0) * 100);
-        const side = (e.score || 0) >= 0 ? "strong" : "weak";
-        body += `
+    body += `<ol class="slip-ladder-list">`;
+    const show = ladder.slice(0, showAllCurrencies ? 20 : 12);
+    for (const e of show) {
+      const pct = Math.round(Math.abs(e.normalized || 0) * 100);
+      const side = (e.score || 0) >= 0 ? "strong" : "weak";
+      body += `
           <li class="slip-ladder-row">
             <span class="mono">${escapeHtml(e.code)}</span>
             <span class="rank-track slip-mini-track">
@@ -118,16 +121,18 @@ function renderLadders(matrix) {
                 (e.score || 0) >= 0 ? "left:50%" : "right:50%;left:auto"
               }"></span>
             </span>
-            <span class="mono ${chgClass(e.score)}">${escapeHtml(formatPct(e.score))}</span>
+            <span class="mono ${strengthClass(e.score)}">${escapeHtml(formatPct(e.score))}</span>
           </li>`;
-      }
-      if (ladder.length > show.length) {
-        body += `<li class="muted">+${ladder.length - show.length} more</li>`;
-      }
-      body += `</ol>`;
     }
+    if (ladder.length > show.length) {
+      body += `<li class="muted">+${ladder.length - show.length} more</li>`;
+    }
+    body += `</ol>`;
     card.innerHTML = body;
     host.appendChild(card);
+  }
+  if (!host.children.length) {
+    host.innerHTML = `<div class="muted slip-ladder-empty">No scored rank ladders yet (vs-gold omitted — no Δ% / no gold daily history).</div>`;
   }
 }
 
@@ -174,7 +179,7 @@ function renderSlipSparks(matrix, history, calendar) {
       note.textContent =
         "No FX history loaded — sparks unavailable. Matrix uses session Δ% only.";
     }
-    host.innerHTML = `<div class="spark-empty muted">no history yet</div>`;
+    host.innerHTML = `<div class="spark-empty muted">No FX daily history series — sparks unavailable (not invented).</div>`;
     return;
   }
 
@@ -196,10 +201,12 @@ function renderSlipSparks(matrix, history, calendar) {
 
   const band = sharedIndexBand(usdSeriesList);
 
+  const hasGoldHist = Array.isArray(goldHist) && goldHist.length >= 2;
+
   if (note) {
-    const goldNote =
-      goldHist?.length >= 2 ? "history present" : "gold history still missing";
-    note.textContent = `Lightweight Charts · each FX vs USD — relative index (start=100), fixed y-band ±${band.half.toFixed(1)} so spikes don’t dominate; ${goldNote}. ${history.from || ""}→${history.to || ""}.`;
+    note.textContent = hasGoldHist
+      ? `Each spark = relative index of that FX vs USD (start=100). End badge = change from 100. Shared y-band ±${band.half.toFixed(1)}. Gold history present. ${history.from || ""}→${history.to || ""}.`
+      : `Each spark = relative index of that FX vs USD (start=100). End badge = change from 100. Gold pane blank until gold daily history exists. ${history.from || ""}→${history.to || ""}.`;
   }
 
   for (const { code, codeSeries, vsUsd } of cards) {
@@ -208,38 +215,38 @@ function renderSlipSparks(matrix, history, calendar) {
     const cUsd = document.createElement("div");
     cUsd.className = "lwc-spark lwc-spark-slip";
     cUsd.setAttribute("aria-label", `${code} vs USD`);
-    const cGold = document.createElement("div");
-    cGold.className = "lwc-spark lwc-spark-slip";
-    cGold.setAttribute("aria-label", `${code} vs gold`);
 
     const endDelta = formatEndDelta(vsUsd.values);
     const endNum = vsUsd.values.length ? vsUsd.values[vsUsd.values.length - 1] - 100 : null;
     const deltaHtml = endDelta
-      ? `<span class="spark-delta ${chgClass(endNum)}">${escapeHtml(endDelta)}</span>`
+      ? `<span class="spark-delta ${strengthClass(endNum)}">${escapeHtml(endDelta)}</span>`
       : "";
 
     card.innerHTML = `<div class="spark-label">${escapeHtml(code)}${deltaHtml}</div>
       <div class="spark-pair"><span class="muted">vs USD</span></div>`;
     card.appendChild(cUsd);
-    const goldLabel = document.createElement("div");
-    goldLabel.className = "spark-pair";
-    goldLabel.innerHTML = `<span class="muted">vs gold</span>`;
-    card.appendChild(goldLabel);
-    card.appendChild(cGold);
-    host.appendChild(card);
 
-    requestAnimationFrame(() => {
-      const tok = themeTokens();
-      drawSpark(cUsd, vsUsd.values, {
-        color: tok.cyan,
-        emptyMsg: codeSeries ? "no overlap" : "no series",
-        dates: vsUsd.dates,
-        events: inRange,
-        scaleMode: band.scaleMode,
-        yMin: band.yMin,
-        yMax: band.yMax,
-      });
-      if (Array.isArray(goldHist) && goldHist.length >= 2 && codeSeries) {
+    if (hasGoldHist && codeSeries) {
+      const goldLabel = document.createElement("div");
+      goldLabel.className = "spark-pair";
+      goldLabel.innerHTML = `<span class="muted">vs gold</span>`;
+      card.appendChild(goldLabel);
+      const cGold = document.createElement("div");
+      cGold.className = "lwc-spark lwc-spark-slip";
+      cGold.setAttribute("aria-label", `${code} vs gold`);
+      card.appendChild(cGold);
+      host.appendChild(card);
+      requestAnimationFrame(() => {
+        const tok = themeTokens();
+        drawSpark(cUsd, vsUsd.values, {
+          color: tok.cyan,
+          emptyMsg: codeSeries ? "no overlap" : "no series",
+          dates: vsUsd.dates,
+          events: inRange,
+          scaleMode: band.scaleMode,
+          yMin: band.yMin,
+          yMax: band.yMax,
+        });
         const g = relativeIndexSeriesDated(codeSeries, goldHist);
         drawSpark(cGold, g.values, {
           color: tok.accent,
@@ -248,10 +255,27 @@ function renderSlipSparks(matrix, history, calendar) {
           events: inRange,
           scaleMode: "robust",
         });
-      } else {
-        drawSpark(cGold, [], { emptyMsg: "level only / no history yet" });
-      }
-    });
+      });
+    } else {
+      const goldNote = document.createElement("p");
+      goldNote.className = "muted slip-gold-only-note";
+      goldNote.textContent =
+        "Gold: snapshot level only — no daily history series yet (not invented).";
+      card.appendChild(goldNote);
+      host.appendChild(card);
+      requestAnimationFrame(() => {
+        const tok = themeTokens();
+        drawSpark(cUsd, vsUsd.values, {
+          color: tok.cyan,
+          emptyMsg: codeSeries ? "no overlap" : "no series",
+          dates: vsUsd.dates,
+          events: inRange,
+          scaleMode: band.scaleMode,
+          yMin: band.yMin,
+          yMax: band.yMax,
+        });
+      });
+    }
   }
 }
 
@@ -347,6 +371,11 @@ export async function renderSlip(snap) {
   setText("slipMethod", matrix.method);
 
   renderMatrix(matrix);
+  const slipLegend = $("slipScoreLegend");
+  if (slipLegend) {
+    slipLegend.textContent =
+      "Green = stronger vs that leg · Red = weaker · (FX level Δ% still uses higher-INR-per-1 = red)";
+  }
   renderLadders(matrix);
   fillSlipCorrelations(matrix, history);
   renderSlipSparks(matrix, history, evLoaded.data);

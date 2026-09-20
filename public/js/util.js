@@ -76,6 +76,19 @@ export function chgClass(n) {
   return "chg-flat";
 }
 
+/**
+ * Color class for relative-strength / slip scores.
+ * Positive = selected strengthened vs leg → green (ok).
+ * Opposite of chgClass, which is for INR-per-1 FX level Δ% (higher = weaker INR → red).
+ */
+export function strengthClass(n) {
+  if (n == null || !Number.isFinite(Number(n))) return "strength-flat";
+  const v = Number(n);
+  if (v > 0) return "strength-up";
+  if (v < 0) return "strength-down";
+  return "strength-flat";
+}
+
 export function setText(id, text) {
   const el = $(id);
   if (el) el.textContent = text ?? "—";

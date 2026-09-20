@@ -506,7 +506,7 @@ export function buildLeadLag(history, opts = {}) {
     };
   }
 
-  const hardKeys = ["XAU", "BRENT", "WTI", "BTC"];
+  const hardKeys = ["XAU", "BRENT", "WTI", "BTC", "COPPER", "WHEAT", "NATGAS", "CRYPTO_INDEX"];
   const hasHard = hardKeys.some(
     (k) =>
       Array.isArray(history?.hardAssets?.[k]) &&
@@ -533,6 +533,24 @@ export function buildLeadLag(history, opts = {}) {
   const usdRet = dailyRetMap(usd);
   const lags = [];
   for (let k = -5; k <= 5; k++) lags.push(k);
+
+  // Date-label columns from USDINR session calendar near end of window.
+  // Anchor so −5…+5 all map to real dates when history is long enough.
+  const usdDates = usd.map((p) => p.t).filter(Boolean).sort();
+  const baseIdx = Math.max(0, usdDates.length - 1 - 5);
+  const lagHeaders = lags.map((k) => {
+    const i = baseIdx + k;
+    const date = i >= 0 && i < usdDates.length ? usdDates[i] : null;
+    let label;
+    if (k === 0) {
+      label = date ? `0 · ${date}` : "0 · same day";
+    } else if (k < 0) {
+      label = date ? `lead ${-k}d · ${date}` : `t${k}`;
+    } else {
+      label = date ? `lag ${k}d · ${date}` : `t+${k}`;
+    }
+    return { lag: k, date, label };
+  });
 
   const rows = [];
   for (const tgt of targets) {
@@ -562,14 +580,20 @@ export function buildLeadLag(history, opts = {}) {
     });
   }
 
+  const winFrom = usdDates[0] || null;
+  const winTo = usdDates[usdDates.length - 1] || null;
+
   return {
     lags,
+    lagHeaders,
+    windowFrom: winFrom,
+    windowTo: winTo,
     rows,
     note:
-      "corr(USDINR_t, other_{t+k}) on daily % returns; k<0 = other leads, k>0 = other lags, k=0 coincident.",
+      "Columns are day lags of the other series vs selected: −5 = other leads by 5 sessions, 0 = same day, +5 = other lags by 5. Headers show illustrative USDINR session dates from the history window.",
     hardAssetNote,
     method:
-      "Lead-lag from stored history only. Negative lag ⇒ other series leads USDINR. FX peers always attempted; gold/oil/BTC only when hardAssets history exists.",
+      "Lead-lag from stored history only. corr(USDINR_t, other_t+k) on daily % returns. Negative lag ⇒ other series leads USDINR. FX peers always attempted; hard assets only when hardAssets history exists.",
   };
 }
 

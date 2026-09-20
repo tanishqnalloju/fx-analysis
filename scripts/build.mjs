@@ -27,6 +27,7 @@ const required = [
   "public/sitemap.xml",
   "public/robots.txt",
   "src/yields.js",
+  "src/hardAssets.js",
   "public/data/snapshot.json",
   "public/data/history.json",
   "public/data/events.json",
