@@ -3,7 +3,8 @@
  * Scheduled cron writes snapshot/history/meta into KV (source of truth).
  * GET /api/* reads KV first, falls back to baked ASSETS public/data/*.json.
  * Real paths /, /desk, /compare, /slip, /how, /notes/* served as SPA (index.html + meta).
- * Live Frankfurter overlay still applied on /api/snapshot + /api/compare.
+ * Public board is snapshot-only (KV/baked). Optional ?live=1 may overlay Frankfurter
+ * with a short timeout; default requests never wait on live FX.
  */
 
 import { fetchTreasuryYields } from "./yields.js";
@@ -186,10 +187,10 @@ async function loadHistoryBase(env, request) {
 
 /* ---------- live FX overlay (request path) ---------- */
 
-async function fetchFrankfurterFx() {
+async function fetchFrankfurterFx(timeoutMs = 800) {
   const url = `${FRANK_BASE}/latest?from=USD`;
   const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), 6000);
+  const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     const res = await fetch(url, { signal: ctrl.signal, redirect: "follow" });
     if (!res.ok) return null;
@@ -651,7 +652,15 @@ function buildCompare(snap, codeRaw) {
 async function loadSnapshotForApi(env, request) {
   const base = await loadSnapshotBase(env, request);
   if (!base) return null;
-  const live = await fetchFrankfurterFx();
+  // Default public path: KV/baked only — never block on Frankfurter.
+  const wantLive =
+    request &&
+    new URL(request.url).searchParams.get("live") === "1";
+  if (!wantLive) {
+    return { ...base, live: false };
+  }
+  // Optional live overlay with a short timeout; fall back to base if slow/unavailable.
+  const live = await fetchFrankfurterFx(800);
   if (live) return mergeLiveFx(base, live);
   return { ...base, live: false };
 }

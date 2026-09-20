@@ -155,6 +155,10 @@ async function main() {
   bindThemeToggle();
   bindNav();
   const status = $("loadStatus");
+  if (status) {
+    status.hidden = false;
+    status.textContent = "Loading board snapshot…";
+  }
   try {
     const [loaded, healthLoaded] = await Promise.all([loadSnapshot(), loadHealth()]);
     snap = loaded.data;
