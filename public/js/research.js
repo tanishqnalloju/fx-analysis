@@ -296,7 +296,7 @@ export function buildRegime(snap, history) {
   cards.push({
     id: "shock",
     title: "USDINR shock flag",
-    primary: shock ? "shock" : "calm",
+    primary: shock ? "Shock" : "Calm",
     secondary: shockDetail,
     flag: shock,
   });
@@ -347,7 +347,7 @@ export function buildRegime(snap, history) {
     series: "USDINR",
     vol7d: vol7,
     vol30d: vol30,
-    shock: shock ? "shock" : "calm",
+    shock: shock ? "Shock" : "Calm",
     note: shockDetail,
   });
 

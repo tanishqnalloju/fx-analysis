@@ -1,155 +1,171 @@
 /**
- * FX Analysis — single-page tabbed desk entry.
- * Tabs: Desk | Compare | Slip/Rank. Hash deep-links: #desk #compare #compare/USD #slip
+ * FX Analysis — path-routed SPA.
+ * Views: / · /desk · /compare[/CODE] · /slip · /how · /notes/YYYY-MM-DD
  */
 import {
   $,
   setText,
   loadSnapshot,
   loadHealth,
-  parseHash,
-  setHash,
+  parseRoute,
+  setPath,
+  applyViewMeta,
   extractStamp,
   shortStamp,
   onSchemeChange,
   bindThemeToggle,
+  loadHistory,
 } from "./util.js";
 import { renderDesk } from "./desk.js";
 import { renderCompare } from "./compare.js";
 import { renderSlip } from "./slip.js";
+import { renderHome } from "./home.js";
+import { renderHow } from "./how.js";
+import { buildDailyTakeaway, buildSlipSummaryFlags, buildRealStrengthBlurb, buildFreshnessLine } from "./takeaway.js";
+import { buildRegime } from "./research.js";
 
-const TABS = ["desk", "compare", "slip"];
+const VIEWS = ["home", "desk", "compare", "slip", "how", "notes"];
 
 let snap = null;
 let via = null;
-let activeTab = "desk";
-let compareCode = null;
+let activeView = "home";
+let compareCode = "USD";
 
 function findHard(id) {
   return (snap?.hardAssets || []).find((h) => String(h.id || "").toUpperCase() === id) || null;
 }
 
-function updateAsOfStrip(health) {
+function updateBoardAsOf(health) {
   const fxDate = (snap.asOf || "").slice(0, 10) || "—";
-  setText("asOfFx", snap.live && snap.liveAsOf ? `${fxDate} · live` : fxDate);
+  setText("asOfFx", fxDate);
   setText("asOfBadge", `FX ${fxDate}`);
 
   const gold = findHard("XAU");
   const brent = findHard("BRENT");
-  const hardStamp =
-    extractStamp(gold?.source) ||
-    extractStamp(brent?.source) ||
-    fxDate;
-  setText(
-    "asOfHard",
-    hardStamp
-      ? `${shortStamp(hardStamp)} · session`
-      : "session print"
-  );
+  const hardStamp = extractStamp(gold?.source) || extractStamp(brent?.source) || fxDate;
+  setText("asOfHard", hardStamp ? shortStamp(hardStamp) : "session");
 
   const btc = findHard("BTC");
   const btcStamp = extractStamp(btc?.source);
   setText("asOfBtc", btcStamp ? shortStamp(btcStamp) : "—");
 
-  const cron =
-    health?.lastRefresh ||
-    extractStamp(snap.timezoneNote) ||
-    (snap.timezoneNote || "").match(/refresh\s+(\S+)/i)?.[1] ||
-    null;
-  setText("asOfCron", cron ? shortStamp(cron) : "—");
-}
+  const y = snap?.yields;
+  setText(
+    "asOfYields",
+    y?.asOf && y.us10y != null ? `${y.asOf}` : "—"
+  );
 
-function updateChrome(health) {
-  if (!snap) return;
-  const asOf = snap.asOf || "—";
   const liveBadge = $("liveBadge");
   if (liveBadge) {
-    if (snap.live) {
-      liveBadge.textContent = "live FX overlay";
-      liveBadge.classList.add("live");
-      liveBadge.classList.remove("warn");
-    } else {
-      liveBadge.textContent = "baked";
-      liveBadge.classList.remove("live");
-    }
+    liveBadge.textContent = "snapshot";
+    liveBadge.classList.remove("live");
   }
-  updateAsOfStrip(health);
+
+  const board = $("boardFreshness");
+  if (board) board.textContent = buildFreshnessLine(snap);
+
   setText(
     "loadStatus",
-    `Loaded via ${via}${snap.live ? " · live overlay active" : " · baked snapshot"} · ${asOf}`
+    `Loaded via ${via} · as-of ${snap.asOf || "—"}`
   );
 }
 
-function setActiveTabUi(tab) {
-  for (const t of TABS) {
-    const btn = document.querySelector(`[data-tab="${t}"]`);
-    const panel = $(`panel-${t}`);
-    if (btn) {
-      btn.classList.toggle("active", t === tab);
-      btn.setAttribute("aria-selected", t === tab ? "true" : "false");
+function setActiveNav(view) {
+  document.querySelectorAll("[data-view]").forEach((btn) => {
+    const v = btn.getAttribute("data-view");
+    const on = v === view || (view === "notes" && v === "desk");
+    btn.classList.toggle("active", on);
+    btn.setAttribute("aria-current", on ? "page" : "false");
+  });
+  for (const v of ["home", "desk", "compare", "slip", "how", "notes"]) {
+    const panel = $(`panel-${v}`);
+    if (panel) panel.hidden = v !== view;
+  }
+  activeView = view;
+}
+
+async function renderNotes(dateStr) {
+  const hist = await loadHistory();
+  const regime = buildRegime(snap, hist.data);
+  const slip = buildSlipSummaryFlags(snap, hist.data);
+  const take = buildDailyTakeaway(snap, hist.data, regime, slip);
+  const pre = $("notesBody");
+  if (pre) pre.textContent = take.text;
+  setText("notesTitle", `INR takeaway · ${take.asOfDate}`);
+  const warn = $("notesWarn");
+  if (warn) {
+    const want = (dateStr || "").slice(0, 10);
+    if (want && want !== take.asOfDate) {
+      warn.hidden = false;
+      warn.textContent = `Requested ${want}; board as-of is ${take.asOfDate}. Notes are generated only from the current snapshot — no backfill invented.`;
+    } else {
+      warn.hidden = true;
+      warn.textContent = "";
     }
-    if (panel) panel.hidden = t !== tab;
   }
-  activeTab = tab;
-  document.title =
-    tab === "compare"
-      ? `Compare${compareCode ? " " + compareCode : ""} · FX Analysis`
-      : tab === "slip"
-        ? "Slip / Rank · FX Analysis"
-        : "FX Analysis · INR real-strength";
 }
 
-async function showTab(tab, code) {
+async function showView(view, code, { push = false } = {}) {
   if (!snap) return;
-  if (!TABS.includes(tab)) tab = "desk";
-  compareCode = tab === "compare" ? code || null : compareCode;
-  setActiveTabUi(tab);
-  setHash(tab, tab === "compare" ? compareCode : null);
-
-  if (tab === "desk") {
-    await renderDesk(snap);
-  } else if (tab === "compare") {
-    await renderCompare(snap, compareCode, (picked) => {
-      compareCode = picked;
-      showTab("compare", picked);
-    });
-  } else if (tab === "slip") {
-    await renderSlip(snap);
+  if (!VIEWS.includes(view)) view = "home";
+  if (view === "compare") {
+    compareCode = (code || "USD").toUpperCase();
+    code = compareCode;
   }
+  setActiveNav(view);
+  applyViewMeta(view, view === "compare" ? compareCode : view === "notes" ? code : null);
+  setPath(view, view === "compare" ? compareCode : view === "notes" ? code : null, {
+    replace: !push,
+  });
+
+  if (view === "home") await renderHome(snap);
+  else if (view === "desk") await renderDesk(snap);
+  else if (view === "compare") {
+    await renderCompare(snap, compareCode, (picked) => {
+      showView("compare", picked, { push: true });
+    });
+  } else if (view === "slip") await renderSlip(snap);
+  else if (view === "how") await renderHow(snap);
+  else if (view === "notes") await renderNotes(code);
 }
 
-function bindTabs() {
-  document.querySelectorAll("[data-tab]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const tab = btn.getAttribute("data-tab");
-      if (tab === "compare") {
-        showTab("compare", compareCode);
-      } else {
-        showTab(tab, null);
-      }
+function bindNav() {
+  document.querySelectorAll("[data-view]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const view = btn.getAttribute("data-view");
+      if (view === "compare") showView("compare", compareCode || "USD", { push: true });
+      else showView(view, null, { push: true });
     });
   });
 
-  window.addEventListener("hashchange", () => {
-    const { tab, code } = parseHash();
-    showTab(tab, code);
+  window.addEventListener("popstate", () => {
+    const { view, code } = parseRoute();
+    showView(view, code, { push: false });
   });
+
+  // One-shot hash → path migration
+  if (location.hash) {
+    const { view, code } = parseRoute();
+    history.replaceState(null, "", view === "compare" ? `/compare/${code || "USD"}` : view === "home" ? "/" : `/${view}`);
+  }
 }
 
 async function main() {
-  const status = $("loadStatus");
   bindThemeToggle();
-  bindTabs();
+  bindNav();
+  const status = $("loadStatus");
   try {
     const [loaded, healthLoaded] = await Promise.all([loadSnapshot(), loadHealth()]);
     snap = loaded.data;
     via = loaded.via;
-    updateChrome(healthLoaded.data);
-    const { tab, code } = parseHash();
-    await showTab(tab, code);
+    updateBoardAsOf(healthLoaded.data);
+    const { view, code } = parseRoute();
+    await showView(view, code);
     onSchemeChange(() => {
       if (!snap) return;
-      showTab(activeTab, activeTab === "compare" ? compareCode : null);
+      const r = parseRoute();
+      showView(activeView, activeView === "compare" ? compareCode : activeView === "notes" ? r.code : null);
     });
   } catch (err) {
     if (status) status.textContent = `Failed to load snapshot: ${err.message || err}`;

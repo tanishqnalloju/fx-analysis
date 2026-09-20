@@ -156,29 +156,145 @@ export async function loadCompare(code, snapFallback) {
   return { data, via };
 }
 
-/** Parse location.hash → { tab, code } */
-export function parseHash() {
-  const raw = (location.hash || "#desk").replace(/^#/, "").trim();
-  const parts = raw.split("/").filter(Boolean);
-  const tab = (parts[0] || "desk").toLowerCase();
-  if (tab === "compare") {
-    const code = parts[1] ? parts[1].toUpperCase() : null;
-    return { tab: "compare", code };
+/** Parse real path (preferred) or legacy hash → { view, code } */
+export function parseRoute() {
+  // Legacy hash deep-links still work once, then we normalize to paths
+  const hash = (location.hash || "").replace(/^#/, "").trim();
+  if (hash) {
+    const parts = hash.split("/").filter(Boolean);
+    const tab = (parts[0] || "").toLowerCase();
+    if (tab === "compare") {
+      return { view: "compare", code: parts[1] ? parts[1].toUpperCase() : "USD" };
+    }
+    if (tab === "slip" || tab === "rank" || tab === "slip-rank" || tab === "everywhere") {
+      return { view: "slip", code: null };
+    }
+    if (tab === "how" || tab === "method" || tab === "methodology") {
+      return { view: "how", code: null };
+    }
+    if (tab === "desk") return { view: "desk", code: null };
+    if (tab === "home" || tab === "") return { view: "home", code: null };
   }
-  if (tab === "slip" || tab === "rank" || tab === "slip-rank") {
-    return { tab: "slip", code: null };
+
+  const path = (location.pathname || "/").replace(/\/+$/, "") || "/";
+  const parts = path.split("/").filter(Boolean);
+  const head = (parts[0] || "").toLowerCase();
+  if (!head) return { view: "home", code: null };
+  if (head === "desk") return { view: "desk", code: null };
+  if (head === "compare") {
+    return { view: "compare", code: parts[1] ? parts[1].toUpperCase() : "USD" };
   }
-  return { tab: "desk", code: null };
+  if (head === "slip" || head === "everywhere") return { view: "slip", code: null };
+  if (head === "how") return { view: "how", code: null };
+  if (head === "notes" && parts[1]) return { view: "notes", code: parts[1] };
+  return { view: "home", code: null };
 }
 
-export function setHash(tab, code) {
-  let h = `#${tab}`;
-  if (tab === "compare" && code) h = `#compare/${String(code).toUpperCase()}`;
-  if (location.hash !== h) {
-    history.replaceState(null, "", h);
-  } else if (!location.hash) {
-    history.replaceState(null, "", h);
+/** @deprecated use parseRoute */
+export function parseHash() {
+  const r = parseRoute();
+  return { tab: r.view === "home" ? "desk" : r.view, code: r.code };
+}
+
+export function pathFor(view, code) {
+  if (view === "home" || view === "" || view == null) return "/";
+  if (view === "compare") {
+    const c = (code || "USD").toUpperCase();
+    return `/compare/${c}`;
   }
+  if (view === "notes" && code) return `/notes/${code}`;
+  return `/${view}`;
+}
+
+export function setPath(view, code, { replace = true } = {}) {
+  const next = pathFor(view, code);
+  const cur = (location.pathname || "/") + (location.search || "");
+  if (cur === next && !location.hash) return;
+  if (replace) history.replaceState(null, "", next);
+  else history.pushState(null, "", next);
+}
+
+/** @deprecated use setPath */
+export function setHash(tab, code) {
+  setPath(tab === "desk" && !code ? "desk" : tab, code);
+}
+
+/** SEO / social meta for a view */
+export const VIEW_META = {
+  home: {
+    title: "Is the rupee weak only against the dollar? · FX Analysis",
+    description:
+      "Session snapshot of INR vs the dollar and majors — research desk, snapshot-only, no invented prices.",
+  },
+  desk: {
+    title: "Desk · FX Analysis · INR real-strength",
+    description:
+      "INR desk board: KPIs, slip flags, rupee vs majors, gold and oil in rupees, yields, and shock/breadth.",
+  },
+  compare: {
+    title: "Compare · FX Analysis",
+    description:
+      "Compare any FX code or hard asset vs INR, USD, gold, and the key basket — from the baked snapshot.",
+  },
+  slip: {
+    title: "Everywhere? · Slip vs USD · FX Analysis",
+    description:
+      "If INR slips vs USD, does it slip vs peers, gold, oil, and BTC? Slip matrix from snapshot and ECB history.",
+  },
+  how: {
+    title: "How this desk works · FX Analysis",
+    description:
+      "Methodology, quote convention, sources, assumptions, and integrity notes for the FX Analysis INR desk.",
+  },
+  notes: {
+    title: "Daily note · FX Analysis",
+    description: "Snapshot-generated INR takeaway note — research commentary only, not RBI REER.",
+  },
+};
+
+export function applyViewMeta(view, code) {
+  const base = VIEW_META[view] || VIEW_META.home;
+  let title = base.title;
+  let description = base.description;
+  if (view === "compare" && code) {
+    title = `Compare ${String(code).toUpperCase()} · FX Analysis`;
+    description = `Cross-rates and relative strength for ${String(code).toUpperCase()} vs INR, USD, gold, and key peers.`;
+  }
+  if (view === "notes" && code) {
+    title = `INR takeaway · ${code} · FX Analysis`;
+  }
+  document.title = title;
+  const setMeta = (sel, attr, val) => {
+    let el = document.querySelector(sel);
+    if (!el && attr === "content") {
+      /* skip create for unknown */
+      return;
+    }
+    if (el) el.setAttribute(attr, val);
+  };
+  const ensure = (attrName, attrVal, content) => {
+    let el = document.querySelector(`meta[${attrName}="${attrVal}"]`);
+    if (!el) {
+      el = document.createElement("meta");
+      el.setAttribute(attrName, attrVal);
+      document.head.appendChild(el);
+    }
+    el.setAttribute("content", content);
+  };
+  ensure("name", "description", description);
+  ensure("property", "og:title", title);
+  ensure("property", "og:description", description);
+  ensure("property", "og:type", "website");
+  const path = pathFor(view, code);
+  const url = "https://fx-analysis.tanishqnalloju.com" + (path === "/" ? "/" : path);
+  ensure("property", "og:url", url);
+  let link = document.querySelector('link[rel="canonical"]');
+  if (!link) {
+    link = document.createElement("link");
+    link.setAttribute("rel", "canonical");
+    document.head.appendChild(link);
+  }
+  link.setAttribute("href", url);
 }
 
 

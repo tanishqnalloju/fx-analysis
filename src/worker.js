@@ -1,7 +1,8 @@
 /**
- * Cloudflare Worker — FX Analysis desk API
+ * Cloudflare Worker — FX Analysis desk API + SPA shell
  * Scheduled cron writes snapshot/history/meta into KV (source of truth).
  * GET /api/* reads KV first, falls back to baked ASSETS public/data/*.json.
+ * Real paths /, /desk, /compare, /slip, /how, /notes/* served as SPA (index.html + meta).
  * Live Frankfurter overlay still applied on /api/snapshot + /api/compare.
  */
 
@@ -1114,6 +1115,166 @@ function refreshKeyAllowed(request, env) {
   return q === secret || header === secret;
 }
 
+
+/* ---------- SPA shell + SEO ---------- */
+const SITE = "https://fx-analysis.tanishqnalloju.com";
+
+const VIEW_META = {
+  home: {
+    title: "Is the rupee weak only against the dollar? · FX Analysis",
+    description:
+      "Session snapshot of INR vs the dollar and majors — research desk, snapshot-only, no invented prices.",
+  },
+  desk: {
+    title: "Desk · FX Analysis · INR real-strength",
+    description:
+      "INR desk board: KPIs, slip flags, rupee vs majors, gold and oil in rupees, yields, and shock/breadth.",
+  },
+  compare: {
+    title: "Compare · FX Analysis",
+    description:
+      "Compare any FX code or hard asset vs INR, USD, gold, and the key basket — from the baked snapshot.",
+  },
+  slip: {
+    title: "Everywhere? · Slip vs USD · FX Analysis",
+    description:
+      "If INR slips vs USD, does it slip vs peers, gold, oil, and BTC? Slip matrix from snapshot and ECB history.",
+  },
+  how: {
+    title: "How this desk works · FX Analysis",
+    description:
+      "Methodology, quote convention, sources, assumptions, and integrity notes for the FX Analysis INR desk.",
+  },
+  notes: {
+    title: "Daily note · FX Analysis",
+    description: "Snapshot-generated INR takeaway note — research commentary only, not RBI REER.",
+  },
+};
+
+function spaViewFromPath(path) {
+  const clean = (path || "/").replace(/\/+$/, "") || "/";
+  if (clean === "/") return { view: "home", code: null, canonical: "/" };
+  if (clean === "/desk") return { view: "desk", code: null, canonical: "/desk" };
+  if (clean === "/slip" || clean === "/everywhere") return { view: "slip", code: null, canonical: "/slip" };
+  if (clean === "/how") return { view: "how", code: null, canonical: "/how" };
+  const cmp = clean.match(/^\/compare(?:\/([A-Za-z0-9_]+))?$/i);
+  if (cmp) {
+    const code = (cmp[1] || "USD").toUpperCase();
+    return { view: "compare", code, canonical: `/compare/${code}` };
+  }
+  const note = clean.match(/^\/notes\/(\d{4}-\d{2}-\d{2})$/);
+  if (note) return { view: "notes", code: note[1], canonical: `/notes/${note[1]}` };
+  return null;
+}
+
+function injectMeta(html, { view, code, canonical }) {
+  const base = VIEW_META[view] || VIEW_META.home;
+  let title = base.title;
+  let description = base.description;
+  if (view === "compare" && code) {
+    title = `Compare ${code} · FX Analysis`;
+    description = `Cross-rates and relative strength for ${code} vs INR, USD, gold, and key peers.`;
+  }
+  if (view === "notes" && code) {
+    title = `INR takeaway · ${code} · FX Analysis`;
+  }
+  const url = SITE + (canonical === "/" ? "/" : canonical);
+  let out = html;
+  out = out.replace(/<title>[^<]*<\/title>/i, `<title>${title}</title>`);
+  out = out.replace(
+    /<meta name="description" content="[^"]*" \/>/i,
+    `<meta name="description" content="${description.replace(/"/g, "&quot;")}" />`
+  );
+  out = out.replace(
+    /<meta property="og:title" content="[^"]*" \/>/i,
+    `<meta property="og:title" content="${title.replace(/"/g, "&quot;")}" />`
+  );
+  out = out.replace(
+    /<meta property="og:description" content="[^"]*" \/>/i,
+    `<meta property="og:description" content="${description.replace(/"/g, "&quot;")}" />`
+  );
+  out = out.replace(
+    /<meta property="og:url" content="[^"]*" \/>/i,
+    `<meta property="og:url" content="${url}" />`
+  );
+  out = out.replace(
+    /<link rel="canonical" href="[^"]*" \/>/i,
+    `<link rel="canonical" href="${url}" />`
+  );
+  return out;
+}
+
+async function serveSpa(env, request, info) {
+  if (!env.ASSETS) return json({ error: "assets unavailable" }, 503);
+  const assetUrl = new URL("/index.html", request.url);
+  const res = await env.ASSETS.fetch(new Request(assetUrl, request));
+  if (!res.ok) return res;
+  const html = await res.text();
+  const body = injectMeta(html, info);
+  return new Response(body, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "public, max-age=60",
+    },
+  });
+}
+
+function buildTakeawayText(snap) {
+  const asOfDate = (snap?.asOf || "").slice(0, 10) || "—";
+  const usd = (snap?.fx || []).find((r) => r.pair === "USDINR");
+  const gold = (snap?.hardAssets || []).find((h) => h.id === "XAU");
+  const brent = (snap?.hardAssets || []).find((h) => h.id === "BRENT");
+  const fmtPct = (n) =>
+    n == null || !Number.isFinite(Number(n))
+      ? "—"
+      : `${Number(n) > 0 ? "+" : ""}${Number(n).toFixed(2)}%`;
+  const fmtInr = (n) =>
+    n == null || !Number.isFinite(Number(n))
+      ? "—"
+      : `₹${Number(n).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+  const rate =
+    usd?.rate != null
+      ? Number(usd.rate).toLocaleString("en-IN", { maximumFractionDigits: 4 })
+      : "—";
+  const lines = [
+    `INR takeaway · ${asOfDate}`,
+    `USDINR ${rate} (${fmtPct(usd?.changePct)}) · Calm`,
+    `Breadth: —/— desk peers same sign as USDINR (—)`,
+    `Slip vs USD: — · peers — · gold — · oil — · btc —`,
+    `Gold ${fmtInr(gold?.inrPrice)}/oz · Brent ${fmtInr(brent?.inrPrice)}/bbl`,
+    `Board: FX ${asOfDate}`,
+    `Research commentary only — not RBI REER. ${SITE}/desk`,
+  ];
+  // Note: full breadth/slip/Calm|Shock computed client-side from history; Worker note is snapshot-safe fallback.
+  return lines.join("\n");
+}
+
+async function serveNote(env, request, dateStr) {
+  const snap = await loadSnapshotBase(env, request);
+  if (!snap) return json({ error: "snapshot unavailable" }, 503);
+  const asOf = (snap.asOf || "").slice(0, 10);
+  const text = buildTakeawayText(snap);
+  const warn =
+    dateStr && dateStr !== asOf
+      ? `\n\n[Note: requested ${dateStr}; board as-of is ${asOf}. No backfill invented.]`
+      : "";
+  // Prefer SPA HTML shell for browser; also allow ?format=txt
+  const url = new URL(request.url);
+  if (url.searchParams.get("format") === "txt") {
+    return new Response(text + warn + "\n", {
+      status: 200,
+      headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=60" },
+    });
+  }
+  return serveSpa(env, request, {
+    view: "notes",
+    code: dateStr || asOf,
+    canonical: `/notes/${dateStr || asOf}`,
+  });
+}
+
+
 export default {
   async scheduled(event, env, ctx) {
     ctx.waitUntil(
@@ -1223,6 +1384,23 @@ export default {
         );
       }
       return json(payload);
+    }
+
+    // Static SEO files
+    if (path === "/sitemap.xml" || path === "/robots.txt") {
+      if (env.ASSETS) return env.ASSETS.fetch(request);
+    }
+
+    // Daily note (snapshot-generated; no invented history)
+    const noteMatch = path.match(/^\/notes\/(\d{4}-\d{2}-\d{2})$/);
+    if (noteMatch && request.method === "GET") {
+      return serveNote(env, request, noteMatch[1]);
+    }
+
+    // SPA views — real paths, not hash
+    const spa = spaViewFromPath(path);
+    if (spa && request.method === "GET") {
+      return serveSpa(env, request, spa);
     }
 
     if (env.ASSETS) {

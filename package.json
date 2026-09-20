@@ -1,9 +1,9 @@
 {
   "name": "fx-analysis",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "FX Analysis \u00b7 INR real-strength \u2014 Worker cron+KV source of truth, Desk/Compare/Slip",
+  "description": "FX Analysis \u00b7 INR real-strength \u2014 path SPA (/ desk compare slip how), Worker cron+KV",
   "scripts": {
     "refresh": "node scripts/refresh.mjs",
     "build": "node scripts/build.mjs",

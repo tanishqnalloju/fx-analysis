@@ -4,8 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="color-scheme" content="light dark" />
-  <title>FX Analysis · INR real-strength</title>
-  <meta name="description" content="FX Analysis desk — INR real-strength monitor, currency compare, and slip/rank matrix from a baked snapshot" />
+  <title>Is the rupee weak only against the dollar? · FX Analysis</title>
+  <meta name="description" content="Session snapshot of INR vs the dollar and majors — research desk, snapshot-only, no invented prices." />
+  <meta property="og:title" content="Is the rupee weak only against the dollar? · FX Analysis" />
+  <meta property="og:description" content="Session snapshot of INR vs the dollar and majors — research desk, snapshot-only, no invented prices." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://fx-analysis.tanishqnalloju.com/" />
+  <link rel="canonical" href="https://fx-analysis.tanishqnalloju.com/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -29,15 +34,14 @@
     <div class="sticky-top">
       <div class="desk-chrome" aria-label="Desk status">
         <div class="desk-chrome-left">
-          <span class="desk-chrome-name">FX Analysis</span>
+          <a class="desk-chrome-name" href="/" data-view="home">FX Analysis</a>
           <span class="desk-chrome-sep">·</span>
-          <span class="desk-chrome-sub">INR real-strength desk</span>
+          <span class="desk-chrome-sub">INR research desk</span>
         </div>
         <div class="desk-chrome-right">
           <div class="badges">
             <div class="badge" id="asOfBadge">as-of —</div>
-            <div class="badge" id="liveBadge">baked</div>
-            <div class="badge">snapshot</div>
+            <div class="badge" id="liveBadge">snapshot</div>
           </div>
           <div class="theme-toggle" role="group" aria-label="Color theme">
             <button type="button" class="theme-toggle-btn" data-theme-opt="system" aria-pressed="true" title="Follow system">System</button>
@@ -46,60 +50,170 @@
           </div>
         </div>
       </div>
-      <nav class="tab-bar" role="tablist" aria-label="FX Analysis tabs">
-        <button type="button" class="tab-btn active" role="tab" data-tab="desk" aria-selected="true" id="tab-desk">Desk</button>
-        <button type="button" class="tab-btn" role="tab" data-tab="compare" aria-selected="false" id="tab-compare">Compare</button>
-        <button type="button" class="tab-btn" role="tab" data-tab="slip" aria-selected="false" id="tab-slip">Slip / Rank</button>
+      <nav class="tab-bar" aria-label="FX Analysis">
+        <a class="tab-btn" href="/" data-view="home">Home</a>
+        <a class="tab-btn" href="/desk" data-view="desk">Desk</a>
+        <a class="tab-btn" href="/compare/USD" data-view="compare">Compare</a>
+        <a class="tab-btn" href="/slip" data-view="slip">Everywhere?</a>
+        <a class="tab-btn" href="/how" data-view="how">How</a>
       </nav>
     </div>
 
-    <header class="hero">
-      <div class="hero-copy">
-        <div class="hero-kicker">Research desk</div>
-        <h1>FX Analysis · INR real-strength</h1>
-        <div class="sub">
-          INR vs FX basket, hard-asset INR cost, cross-currency Compare, and Slip / Rank
-          (“if it slips vs USD, does it slip everywhere?”).
-          Numbers from snapshot only — nothing invented client-side.
-        </div>
-        <div class="asof-strip" id="asOfStrip" aria-label="As-of stamps">
-          <div class="asof-cell">
-            <div class="asof-lbl">FX fix</div>
-            <div class="asof-val" id="asOfFx">—</div>
-          </div>
-          <div class="asof-cell">
-            <div class="asof-lbl">Gold / oil</div>
-            <div class="asof-val" id="asOfHard">—</div>
-          </div>
-          <div class="asof-cell">
-            <div class="asof-lbl">BTC</div>
-            <div class="asof-val" id="asOfBtc">—</div>
-          </div>
-          <div class="asof-cell">
-            <div class="asof-lbl">KV cron</div>
-            <div class="asof-val" id="asOfCron">—</div>
-          </div>
-          <div class="asof-cell">
-            <div class="asof-lbl">UST yields</div>
-            <div class="asof-val" id="asOfYields">—</div>
-          </div>
-        </div>
-      </div>
-    </header>
-
     <div class="status-line" id="loadStatus">Loading snapshot…</div>
 
-    <!-- ========== DESK ========== -->
-    <div id="panel-desk" role="tabpanel" aria-labelledby="tab-desk">
-      <div class="kpi-row" id="kpiRow">
-        <div class="kpi"><div class="lbl">USDINR</div><div class="num" id="kpiUsdInr">—</div><div class="sublbl" id="kpiUsdInrChg"></div></div>
-        <div class="kpi"><div class="lbl">Brent INR/bbl</div><div class="num" id="kpiBrentInr">—</div><div class="sublbl" id="kpiBrentChg"></div></div>
-        <div class="kpi"><div class="lbl">Gold INR/oz</div><div class="num" id="kpiGoldInr">—</div><div class="sublbl" id="kpiGoldUsd"></div></div>
-        <div class="kpi"><div class="lbl">BTC INR</div><div class="num" id="kpiBtcInr">—</div><div class="sublbl" id="kpiBtcChg"></div></div>
-      </div>
+    <!-- ========== HOME ========== -->
+    <div id="panel-home" hidden>
+      <header class="hero hero-home">
+        <div class="hero-copy">
+          <div class="hero-kicker">Session snapshot</div>
+          <h1>Is the rupee weak only against the dollar?</h1>
+          <div class="sub home-session-meta">
+            Session snapshot · <span id="homeAsOf">—</span> · USDINR
+            <span class="mono" id="homeUsdInr">—</span>
+            <span id="homeUsdChg" class="home-chg mono">—</span>
+            · <span id="homeShock">Calm</span>
+            · <span class="verdict-pill" id="homeLabel">MIXED</span>
+          </div>
+          <p class="narrative" id="homeVerdict1">—</p>
+          <p class="narrative" id="homeVerdict2">—</p>
+          <p class="chart-caption" id="homeResearchLine">Research / education only.</p>
+          <p class="quote-lesson" id="homeQuoteLesson"></p>
+        </div>
+      </header>
 
       <section class="panel">
-        <h2>US Treasury yields <span class="h2-meta">fundamental overlay</span></h2>
+        <h2>Today’s desk read</h2>
+        <p class="narrative" id="homeStrength1">—</p>
+        <p class="narrative" id="homeStrength2">—</p>
+        <div class="home-links">
+          <a class="home-link" href="/desk" data-view="desk">Open the desk →</a>
+          <a class="home-link" href="/compare/USD" data-view="compare">Compare USD →</a>
+          <a class="home-link" href="/slip" data-view="slip">Everywhere? →</a>
+          <a class="home-link" id="homeNoteLink" href="/notes/">Daily note</a>
+        </div>
+      </section>
+
+      <footer class="sources">
+        <div class="disclaimer footer-extra">
+          Research / education only — not investment advice. Real-strength narrative is commentary, not a formal index.
+          Snapshot may be stale. Prefer Frankfurter/ECB reference rates.
+        </div>
+      </footer>
+    </div>
+
+    <!-- ========== DESK ========== -->
+    <div id="panel-desk" hidden>
+      <header class="hero">
+        <div class="hero-copy">
+          <div class="hero-kicker">Desk</div>
+          <h1>INR real-strength board</h1>
+          <p class="narrative" id="deskVerdictLine">—</p>
+          <div class="asof-strip" id="asOfStrip" aria-label="Board as-of">
+            <div class="asof-cell">
+              <div class="asof-lbl">FX fix</div>
+              <div class="asof-val" id="asOfFx">—</div>
+            </div>
+            <div class="asof-cell">
+              <div class="asof-lbl">Gold / oil</div>
+              <div class="asof-val" id="asOfHard">—</div>
+            </div>
+            <div class="asof-cell">
+              <div class="asof-lbl">BTC</div>
+              <div class="asof-val" id="asOfBtc">—</div>
+            </div>
+            <div class="asof-cell">
+              <div class="asof-lbl">UST yields</div>
+              <div class="asof-val" id="asOfYields">—</div>
+            </div>
+          </div>
+          <p class="chart-caption" id="boardFreshness">—</p>
+        </div>
+      </header>
+
+      <div class="kpi-row" id="kpiRow">
+        <div class="kpi"><div class="lbl">USDINR</div><div class="num" id="kpiUsdInr">—</div><div class="sublbl" id="kpiUsdInrChg"></div></div>
+        <div class="kpi"><div class="lbl">Brent ₹/bbl</div><div class="num" id="kpiBrentInr">—</div><div class="sublbl" id="kpiBrentChg"></div></div>
+        <div class="kpi"><div class="lbl">Gold ₹/oz</div><div class="num" id="kpiGoldInr">—</div><div class="sublbl" id="kpiGoldChg"></div></div>
+        <div class="kpi"><div class="lbl">BTC ₹</div><div class="num" id="kpiBtcInr">—</div><div class="sublbl" id="kpiBtcChg"></div></div>
+      </div>
+
+      <section class="panel" id="slipFlagsPanel">
+        <h2>Slip vs USD <span class="h2-meta">one-line flags</span></h2>
+        <p class="narrative" id="slipFlagsLine">—</p>
+        <div class="slip-flags-row" id="slipFlagsChips"></div>
+        <p class="chart-caption"><a href="/slip" data-view="slip">Full slip matrix →</a></p>
+      </section>
+
+      <section class="panel">
+        <h2>Rupee vs majors <span class="h2-meta">INR per 1 foreign · session Δ</span></h2>
+        <div class="table-wrap">
+          <table class="desk-table" id="fxTable">
+            <thead>
+              <tr>
+                <th>Pair</th>
+                <th>Rate</th>
+                <th>Session Δ</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody id="fxBody">
+              <tr><td colspan="4" class="muted">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="chart-wrap chart-wrap-sm">
+          <canvas id="fxBars" width="900" height="200" aria-label="Rupee vs majors session change bars"></canvas>
+        </div>
+        <p class="chart-caption" id="fxCaption">RBI ETCD INR pairs (USD/EUR/GBP/JPY) + majors · higher rate = weaker INR</p>
+      </section>
+
+      <section class="panel" id="asiaPeersPanel" hidden>
+        <h2>Asia peers <span class="h2-meta">when present in snapshot</span></h2>
+        <div class="table-wrap">
+          <table class="desk-table" id="asiaTable">
+            <thead>
+              <tr><th>Pair</th><th>Rate</th><th>Session Δ</th><th>Note</th></tr>
+            </thead>
+            <tbody id="asiaBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="importCostPanel">
+        <h2>What gold and oil cost in rupees</h2>
+        <div class="table-wrap">
+          <table class="desk-table" id="hardTable">
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>USD</th>
+                <th>INR</th>
+                <th>Session Δ</th>
+                <th>Unit</th>
+              </tr>
+            </thead>
+            <tbody id="hardBody">
+              <tr><td colspan="5" class="muted">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="chart-wrap chart-wrap-sm" id="hardBarsWrap">
+          <canvas id="hardBars" width="900" height="200" aria-label="Gold and oil INR cost bars"></canvas>
+        </div>
+        <p class="chart-caption" id="hardCaption">Gold &amp; Brent in rupees (BTC listed in the table, not on this bar chart). Multi-horizon 30/90/365 only when hard-asset history exists.</p>
+        <div id="importHorizon" hidden>
+          <p class="chart-caption" id="importHorizonNote"></p>
+        </div>
+      </section>
+
+      <section class="panel" id="eventStripPanel" hidden>
+        <h2>Event strip <span class="h2-meta">curated calendar</span></h2>
+        <div class="event-strip" id="eventStrip"></div>
+        <p class="chart-caption" id="eventStripNote"></p>
+      </section>
+
+      <section class="panel">
+        <h2>US Treasury yields <span class="h2-meta">context only</span></h2>
         <div class="yield-strip" id="yieldStrip" aria-label="US Treasury yields">
           <div class="yield-cell"><div class="lbl">2y</div><div class="num" id="yield2y">—</div></div>
           <div class="yield-cell"><div class="lbl">10y</div><div class="num" id="yield10y">—</div></div>
@@ -110,7 +224,7 @@
       </section>
 
       <section class="panel">
-        <h2>Regime dashboard <span class="h2-meta">from desk series</span></h2>
+        <h2>Is this a shock day? <span class="h2-meta">regime · breadth</span></h2>
         <div class="regime-cards" id="regimeCards"></div>
         <div class="table-wrap" style="margin-top:10px">
           <table class="desk-table" id="regimeTable">
@@ -132,147 +246,48 @@
       </section>
 
       <section class="panel">
-        <h2>FX basket <span class="h2-meta">INR per 1 foreign · RBI ETCD + top majors</span></h2>
-        <div class="table-wrap">
-          <table class="desk-table" id="fxTable">
-            <thead>
-              <tr>
-                <th>Pair</th>
-                <th>Rate</th>
-                <th>Δ%</th>
-                <th>Note</th>
-              </tr>
-            </thead>
-            <tbody id="fxBody">
-              <tr><td colspan="4" class="muted">—</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="chart-wrap chart-wrap-sm">
-          <canvas id="fxBars" width="900" height="200" aria-label="FX change percent bars"></canvas>
-        </div>
-        <p class="chart-caption" id="fxCaption">RBI ETCD INR pairs (USD/EUR/GBP/JPY) + top majors · not full universe · Session Δ% (higher rate = weaker INR)</p>
-      </section>
-
-      <section class="panel">
-        <h2>Hard assets <span class="h2-meta">USD + INR</span></h2>
-        <div class="table-wrap">
-          <table class="desk-table" id="hardTable">
-            <thead>
-              <tr>
-                <th>Asset</th>
-                <th>USD</th>
-                <th>INR</th>
-                <th>Δ%</th>
-                <th>Unit</th>
-              </tr>
-            </thead>
-            <tbody id="hardBody">
-              <tr><td colspan="5" class="muted">—</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="chart-wrap chart-wrap-sm">
-          <canvas id="hardBars" width="900" height="200" aria-label="Hard asset INR price bars"></canvas>
-        </div>
-        <p class="chart-caption" id="hardCaption">INR = usdPrice × USDINR (recomputed on FX fix)</p>
-      </section>
-
-      <section class="panel">
-        <h2>Real-strength legs</h2>
+        <h2>Real-strength <span class="h2-meta">two sentences</span></h2>
+        <div class="strength-label mono" id="strengthLabel">MIXED</div>
         <p class="narrative" id="strengthSummary">—</p>
-        <div class="legs" id="legs"></div>
+        <p class="narrative" id="strengthSummary2">—</p>
       </section>
 
-      <section class="panel">
-        <h2>REER / NEER <span class="h2-meta">placeholder</span></h2>
-        <div class="reer-placeholder" id="reerPanel">
-          <div class="reer-title">No series loaded — not invented</div>
-          <p>
-            RBI publishes NEER/REER (trade-weighted INR indices). A reliable public API is not wired yet;
-            this panel reserves structure for <span class="mono">history.series.NEER</span> /
-            <span class="mono">history.series.REER</span> when a sourced feed is available.
-          </p>
-          <p>
-            Desk “real-strength” commentary is <strong>not</strong> a formal PPP or REER index — do not treat narrative legs as official weights.
-          </p>
-          <div class="reer-slots">
-            <div class="reer-slot">NEER <div class="val" id="reerNeer">—</div><div class="tiny" id="reerNeerNote">awaiting series</div></div>
-            <div class="reer-slot">REER <div class="val" id="reerReer">—</div><div class="tiny" id="reerReerNote">awaiting series</div></div>
-          </div>
-        </div>
+      <section class="panel" id="takeawayPanel">
+        <h2>Daily takeaway</h2>
+        <pre class="takeaway-pre" id="takeawayPre"></pre>
+        <p class="chart-caption"><a id="takeawayNoteLink" href="/notes/">Open as /notes/…</a></p>
       </section>
 
-      <section class="panel">
-        <h2>Methodology</h2>
-        <div class="method-grid" id="methodGrid">
-          <div class="method-item">
-            <strong>Identities</strong>
-            <p>FX quotes are <span class="mono">INR per 1 foreign</span> (e.g. USDINR). Crosses via INR bridge: units of X per 1 S = inrPer[S] / inrPer[X].</p>
-          </div>
-          <div class="method-item">
-            <strong>Δ% (session)</strong>
-            <p>Percent change of the INR-per-1 rate (or hard-asset print) vs prior observation in the snapshot. Higher XXXINR ⇒ weaker INR in FX terms.</p>
-          </div>
-          <div class="method-item">
-            <strong>ECB vs FloatRates</strong>
-            <p>Frankfurter/ECB is preferred when both exist. FloatRates extras are labeled notOnEcb and may lag; never treated as ECB reference.</p>
-          </div>
-          <div class="method-item">
-            <strong>Hard-asset INR</strong>
-            <p>INR price = usdPrice × USDINR. Multi-day hard-asset history is never invented.</p>
-          </div>
-          <div class="method-item">
-            <strong>Desk commentary ≠ PPP/REER</strong>
-            <p>Real-strength narrative is research commentary only — not a formal purchasing-power or trade-weighted index.</p>
-          </div>
-          <div class="method-item">
-            <strong>Technicals / regime / model card</strong>
-            <p>Daily SMA/RSI/MACD, realized vol, breadth, and kx-style KEEP/WEAK/KILL validation from stored history only. Desk summary counts aligned vs counter — not a trade signal. Language: aligned / counter / elevated / depressed / shock.</p>
-          </div>
-          <div class="method-item">
-            <strong>US Treasury yields</strong>
-            <p>2y / 10y / curve from Treasury daily CSV when fetch succeeds; otherwise shown as — (never invented).</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel assumptions-panel" id="assumptionsPanel" hidden>
-        <h2>Assumptions</h2>
-        <ul class="assumptions" id="assumptionsList"></ul>
-      </section>
+      <p class="chart-caption desk-how-link"><a href="/how" data-view="how">Methodology, sources &amp; assumptions → /how</a></p>
 
       <footer class="sources">
-        <div class="sources-head">Sources · Methodology</div>
-        <ul class="source-list" id="sourcesList"></ul>
-        <div class="footer-extra" id="timezoneNote"></div>
         <div class="disclaimer footer-extra">
           Research / education only — not investment advice. Real-strength narrative is commentary, not a formal index.
-          Snapshot may be stale; live FX overlay (when present) is ECB reference via Frankfurter.
+          Snapshot may be stale. Prefer Frankfurter/ECB reference rates.
         </div>
       </footer>
     </div>
 
     <!-- ========== COMPARE ========== -->
-    <div id="panel-compare" role="tabpanel" aria-labelledby="tab-compare" hidden>
-      <div class="status-line" id="cmpStatus">Pick a code to compare</div>
+    <div id="panel-compare" hidden>
+      <div class="status-line" id="cmpStatus">Compare USD</div>
 
       <section class="panel">
         <h2>Select currency / asset</h2>
         <div class="picker-toolbar">
           <label class="picker-filter-label" for="compareSelect">Code</label>
           <select id="compareSelect" class="compare-select" aria-label="Select FX code">
-            <option value="">Select FX / asset…</option>
+            <option value="USD">USD</option>
           </select>
           <label class="picker-filter-label" for="compareFilter">Jump</label>
           <input type="search" id="compareFilter" class="picker-filter" list="compareCodeList" placeholder="Type code…" autocomplete="off" />
           <datalist id="compareCodeList"></datalist>
         </div>
         <div class="compare-unavailable" id="compareUnavailable"></div>
-        <p class="chart-caption" id="compareHint">Dropdown = full universe · basket legs = key peers + hard assets.</p>
+        <p class="chart-caption" id="compareHint">Defaults to USD. Dropdown = full universe · basket legs = key peers + hard assets.</p>
       </section>
 
-      <div id="compareView" hidden>
+      <div id="compareView">
         <div class="kpi-row kpi-row-3" id="cmpKpiRow">
           <div class="kpi">
             <div class="lbl" id="cmpKpiInrLbl">vs INR</div>
@@ -300,7 +315,7 @@
                   <th>Leg</th>
                   <th>Units of X / 1 selected</th>
                   <th>Inverse</th>
-                  <th>Δ% (session)</th>
+                  <th>Session Δ</th>
                   <th>Note</th>
                 </tr>
               </thead>
@@ -314,7 +329,7 @@
         <section class="panel">
           <h2>Relative-strength ranking</h2>
           <p class="chart-caption caption-tight">
-            Session cross Δ% ≈ Δ%selected − Δ%leg. Positive = selected strengthened vs that leg.
+            Session cross Δ ≈ Δ selected − Δ leg. Positive = selected strengthened vs that leg.
             Bars normalized to max |score| (−1…+1). Key basket only.
           </p>
           <div class="rank-bars" id="cmpRankBars"></div>
@@ -360,28 +375,7 @@
           <div class="chart-wrap chart-wrap-sm chart-wrap-lwc" style="margin-top:10px">
             <div id="cmpTechSpark" class="lwc-spark lwc-spark-main" aria-label="Price with MA20 MA50"></div>
           </div>
-          <p class="chart-caption" id="cmpTechNote">Lightweight Charts · MA20 (cyan) · MA50 (amber) on primary series when enough points · fixed-band where used on sparks.</p>
-        </section>
-
-        <section class="panel">
-          <h2>Model card <span class="h2-meta">validation / kill signals</span></h2>
-          <div class="table-wrap">
-            <table class="desk-table" id="cmpModelTable">
-              <thead>
-                <tr>
-                  <th>Rule</th>
-                  <th>n</th>
-                  <th>Hit %</th>
-                  <th>Mean next-5d</th>
-                  <th>Verdict</th>
-                </tr>
-              </thead>
-              <tbody id="cmpModelBody">
-                <tr><td colspan="5" class="muted">—</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="chart-caption" id="cmpModelFoot"></p>
+          <p class="chart-caption" id="cmpTechNote">Lightweight Charts · MA20 (cyan) · MA50 (amber) · fixed-band where used on sparks.</p>
         </section>
 
         <section class="panel">
@@ -407,13 +401,13 @@
       </div>
     </div>
 
-    <!-- ========== SLIP / RANK ========== -->
-    <div id="panel-slip" role="tabpanel" aria-labelledby="tab-slip" hidden>
+    <!-- ========== SLIP / EVERYWHERE ========== -->
+    <div id="panel-slip" hidden>
       <div class="status-line" id="slipStatus">Building slip matrix…</div>
 
       <section class="panel">
         <div class="slip-head">
-          <h2>If it slips vs USD, does it slip everywhere?</h2>
+          <h2>Everywhere? <span class="h2-meta">Slip vs USD</span></h2>
           <div class="badge warn" id="slipHistoryBadge">ASSUMPTION · limited history</div>
         </div>
         <div class="slip-toolbar">
@@ -424,8 +418,8 @@
           <span class="chart-caption">Default: key basket (USD/EUR/GBP/JPY/CNY/INR)</span>
         </div>
         <p class="chart-caption" style="margin-bottom:10px">
-          Matrix vs USD / peers / gold / oil / BTC.
-          Uses multi-day Frankfurter history when present; otherwise session Δ%.
+          If it softens vs the dollar, does it soften vs peers, gold, oil, and BTC?
+          Uses multi-day Frankfurter history when present; otherwise session Δ.
           Hard-asset history is never invented.
         </p>
         <div class="table-wrap table-wrap-scroll">
@@ -472,6 +466,87 @@
         <h2>Narrative</h2>
         <p class="narrative" id="slipNarrative">—</p>
         <p class="chart-caption" id="slipMethod"></p>
+      </section>
+    </div>
+
+    <!-- ========== HOW ========== -->
+    <div id="panel-how" hidden>
+      <header class="hero">
+        <div class="hero-copy">
+          <div class="hero-kicker">Methodology</div>
+          <h1>How this desk works</h1>
+          <p class="narrative" id="howIntegrity">—</p>
+        </div>
+      </header>
+
+      <section class="panel">
+        <h2>Quote convention</h2>
+        <p class="narrative" id="howQuote">—</p>
+      </section>
+
+      <section class="panel">
+        <h2>Session Δ</h2>
+        <p class="narrative" id="howDelta">—</p>
+      </section>
+
+      <section class="panel">
+        <h2>Sources</h2>
+        <p class="narrative" id="howSourcesLead">—</p>
+        <ul class="source-list" id="howSources"></ul>
+        <div class="footer-extra" id="howTimezone"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Assumptions</h2>
+        <ul class="assumptions" id="howAssumptions"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Validation card <span class="h2-meta">KEEP / WEAK / KILL — research only</span></h2>
+        <p class="chart-caption">Forward-test language for desk research. Not trade signals. Hidden from the public Compare board.</p>
+        <div class="table-wrap">
+          <table class="desk-table" id="howModelTable">
+            <thead>
+              <tr>
+                <th>Rule</th>
+                <th>n</th>
+                <th>Hit %</th>
+                <th>Mean next-5d</th>
+                <th>Verdict</th>
+              </tr>
+            </thead>
+            <tbody id="howModelBody">
+              <tr><td colspan="5" class="muted">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="chart-caption" id="howModelFoot"></p>
+      </section>
+
+      <section class="panel">
+        <h2>Board refresh</h2>
+        <p class="narrative" id="howCronNote">—</p>
+      </section>
+
+      <footer class="sources">
+        <div class="disclaimer footer-extra">
+          Research / education only — not investment advice. Real-strength narrative is commentary, not a formal index.
+        </div>
+      </footer>
+    </div>
+
+    <!-- ========== NOTES ========== -->
+    <div id="panel-notes" hidden>
+      <header class="hero">
+        <div class="hero-copy">
+          <div class="hero-kicker">Daily note</div>
+          <h1 id="notesTitle">INR takeaway</h1>
+          <p class="chart-caption warn-line" id="notesWarn" hidden></p>
+        </div>
+      </header>
+      <section class="panel">
+        <pre class="takeaway-pre" id="notesBody"></pre>
+        <p class="chart-caption"><a href="/desk" data-view="desk">← Back to desk</a></p>
       </section>
     </div>
   </div>

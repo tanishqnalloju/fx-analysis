@@ -1,5 +1,5 @@
 /**
- * Slip / Rank tab — FX matrix + heatmap + history sparks.
+ * Everywhere? · Slip vs USD — FX matrix + heatmap + history sparks.
  * Defaults to key basket; optional “show all” for full Frankfurter universe.
  * “If it slips vs USD, does it slip everywhere?”
  */
@@ -295,7 +295,7 @@ function bindUniverseToggle(snap, remount) {
   });
 }
 
-/** Render Slip / Rank tab from snapshot (+ optional history). */
+/** Render Everywhere? · Slip vs USD from snapshot (+ optional history). */
 export async function renderSlip(snap) {
   const remount = () => renderSlip(snap);
   bindUniverseToggle(snap, remount);

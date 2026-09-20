@@ -1,5 +1,7 @@
 /**
- * Desk tab — FX basket + hard assets + real-strength legs from snapshot.
+ * Desk — ordered board from snapshot only.
+ * 1 headline/verdict/as-of · 2 KPIs · 3 slip flags · 4 rupee vs majors ·
+ * 5 gold/oil INR · 6 yields · 7 shock day · 8 link to /how
  */
 import {
   $,
@@ -10,10 +12,18 @@ import {
   chgClass,
   setText,
   loadHistory,
+  loadEvents,
   themeTokens,
 } from "./util.js";
 import { buildRegime } from "./research.js";
 import { DESK_FX_BASKET_IDS, filterDeskFxRows } from "./compare-lib.js";
+import {
+  buildRealStrengthBlurb,
+  buildSlipSummaryFlags,
+  buildDailyTakeaway,
+  formatPairRate,
+  filterAsiaPeerRows,
+} from "./takeaway.js";
 
 function findFx(fx, pair) {
   return (fx || []).find((r) => r.pair === pair) || null;
@@ -46,10 +56,12 @@ function fillKpis(snap) {
   }
 
   setText("kpiGoldInr", gold ? formatInr(gold.inrPrice) : "—");
-  const goldUsd = $("kpiGoldUsd");
-  if (goldUsd) {
-    goldUsd.textContent =
-      gold && gold.usdPrice != null ? `$${formatRate(gold.usdPrice)} / oz` : "";
+  const goldChg = $("kpiGoldChg");
+  if (goldChg) {
+    goldChg.textContent = gold
+      ? `Δ ${formatPct(gold.changePct)}${gold.usdPrice != null ? ` · $${formatRate(gold.usdPrice)}` : ""}`
+      : "";
+    goldChg.className = `sublbl ${chgClass(gold?.changePct)}`;
   }
 
   setText("kpiBtcInr", btc ? formatInr(btc.inrPrice) : "—");
@@ -62,25 +74,52 @@ function fillKpis(snap) {
   }
 }
 
+function fillFxRow(tbody, row) {
+  const tr = document.createElement("tr");
+  const fmt = formatPairRate(row.pair, row.rate);
+  const rateHtml = fmt.secondary
+    ? `<div class="mono">${escapeHtml(fmt.primary)}</div><div class="muted tiny mono">${escapeHtml(fmt.secondary)}</div>`
+    : `<span class="mono">${escapeHtml(fmt.primary)}</span>`;
+  // Public note: strip notOnEcb / provider jargon
+  let note = row.note || "";
+  note = note.replace(/\s*·\s*FloatRates only \(not ECB\)/gi, "");
+  note = note.replace(/notOnEcb/gi, "");
+  if (row.provider === "floatrates" && !/FloatRates/i.test(note)) {
+    note = (note ? note + " · " : "") + "non-ECB print";
+  }
+  tr.innerHTML = `
+    <td>${escapeHtml(row.pair ?? "—")}</td>
+    <td>${rateHtml}</td>
+    <td class="mono ${chgClass(row.changePct)}">${escapeHtml(formatPct(row.changePct))}</td>
+    <td class="muted">${escapeHtml(note || row.source || "")}</td>
+  `;
+  tbody.appendChild(tr);
+}
+
 function fillFxTable(fx) {
   const body = $("fxBody");
   if (!body) return;
   body.innerHTML = "";
-  // Desk shows RBI ETCD INR pairs + top majors only (not full Frankfurter dump)
   const rows = filterDeskFxRows(fx);
   if (!rows.length) {
     body.innerHTML = `<tr><td colspan="4" class="muted">No desk FX rows in snapshot</td></tr>`;
     return;
   }
-  for (const row of rows) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${escapeHtml(row.pair ?? "—")}</td>
-      <td class="mono">${escapeHtml(formatRate(row.rate))}</td>
-      <td class="mono ${chgClass(row.changePct)}">${escapeHtml(formatPct(row.changePct))}</td>
-      <td class="muted">${escapeHtml(row.note || row.source || "")}</td>
-    `;
-    body.appendChild(tr);
+  for (const row of rows) fillFxRow(body, row);
+
+  const asiaPanel = $("asiaPeersPanel");
+  const asiaBody = $("asiaBody");
+  const asia = filterAsiaPeerRows(fx).filter(
+    (r) => !DESK_FX_BASKET_IDS.includes(String(r.pair || "").replace(/INR$/i, "").toUpperCase())
+  );
+  if (asiaPanel && asiaBody) {
+    asiaBody.innerHTML = "";
+    if (asia.length) {
+      asiaPanel.hidden = false;
+      for (const row of asia) fillFxRow(asiaBody, row);
+    } else {
+      asiaPanel.hidden = true;
+    }
   }
 }
 
@@ -88,11 +127,15 @@ function fillHardTable(hard) {
   const body = $("hardBody");
   if (!body) return;
   body.innerHTML = "";
-  if (!hard?.length) {
+  // Prefer gold/oil first; include BTC in table only
+  const order = ["XAU", "BRENT", "WTI", "BTC"];
+  const byId = new Map((hard || []).map((h) => [String(h.id || "").toUpperCase(), h]));
+  const rows = order.map((id) => byId.get(id)).filter(Boolean);
+  if (!rows.length) {
     body.innerHTML = `<tr><td colspan="5" class="muted">No hard-asset rows in snapshot</td></tr>`;
     return;
   }
-  for (const row of hard) {
+  for (const row of rows) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${escapeHtml(row.name || row.id || "—")}</td>
@@ -105,64 +148,25 @@ function fillHardTable(hard) {
   }
 }
 
-function fillStrength(rs) {
-  setText("strengthSummary", rs?.summary || "—");
-  const legsEl = $("legs");
-  if (!legsEl) return;
-  legsEl.innerHTML = "";
-  for (const leg of rs?.legs || []) {
-    const div = document.createElement("div");
-    div.className = "leg";
-    const verdict = (leg.verdict || "").toLowerCase();
-    div.innerHTML = `
-      <div class="leg-head">
-        <span class="leg-lens">${escapeHtml(leg.lens || "—")}</span>
-        <span class="verdict ${escapeHtml(verdict)}">${escapeHtml(leg.verdict || "—")}</span>
-      </div>
-      <div class="leg-detail">${escapeHtml(leg.detail || "")}</div>
-    `;
-    legsEl.appendChild(div);
+function fillSlipFlags(slip) {
+  setText("slipFlagsLine", slip.line || "—");
+  const chips = $("slipFlagsChips");
+  if (!chips) return;
+  chips.innerHTML = "";
+  for (const f of slip.flags || []) {
+    const span = document.createElement("span");
+    span.className = `slip-flag slip-flag-${escapeHtml(f.severity || "note")}`;
+    span.textContent = f.label;
+    chips.appendChild(span);
   }
 }
 
-function fillSourcesAndAssumptions(snap) {
-  const sourcesList = $("sourcesList");
-  if (sourcesList) {
-    sourcesList.innerHTML = "";
-    const items = snap.scriptures || [];
-    for (const s of items) {
-      const li = document.createElement("li");
-      li.textContent = s;
-      sourcesList.appendChild(li);
-    }
-    if (!items.length) {
-      const li = document.createElement("li");
-      li.className = "muted";
-      li.textContent = "No scriptures in snapshot";
-      sourcesList.appendChild(li);
-    }
-  }
-
-  const assumptions = snap.assumptions || [];
-  const panel = $("assumptionsPanel");
-  const list = $("assumptionsList");
-  if (panel && list) {
-    list.innerHTML = "";
-    if (assumptions.length) {
-      panel.hidden = false;
-      for (const a of assumptions) {
-        const li = document.createElement("li");
-        li.textContent = a;
-        list.appendChild(li);
-      }
-    } else {
-      panel.hidden = true;
-    }
-  }
-
-  setText("timezoneNote", snap.timezoneNote || "");
+function fillStrength(strength) {
+  setText("strengthLabel", strength.label || "MIXED");
+  setText("strengthSummary", strength.sentence1 || "—");
+  setText("strengthSummary2", strength.sentence2 || "");
+  setText("deskVerdictLine", `${strength.label}: ${strength.sentence1}`);
 }
-
 
 function fillYields(snap) {
   const y = snap?.yields;
@@ -185,7 +189,7 @@ function fillYields(snap) {
   setText("yieldCurve", `${Number(curve).toFixed(2)}%`);
   setText("yieldAsOf", y.asOf || "—");
   if (note) {
-    note.textContent = `Source: ${y.source || "U.S. Treasury"} · as-of ${y.asOf || "—"}`;
+    note.textContent = `Source: ${y.source || "U.S. Treasury"} · as-of ${y.asOf || "—"} · context only`;
   }
 }
 
@@ -197,9 +201,13 @@ function fillRegime(snap, history) {
     for (const c of regime.cards || []) {
       const div = document.createElement("div");
       div.className = "regime-card" + (c.flag ? " regime-shock" : "");
+      let primary = String(c.primary);
+      // Spell Calm correctly (title case for public board)
+      if (primary.toLowerCase() === "calm") primary = "Calm";
+      if (primary.toLowerCase() === "shock") primary = "Shock";
       div.innerHTML = `
         <div class="regime-title">${escapeHtml(c.title)}</div>
-        <div class="regime-primary mono">${escapeHtml(String(c.primary))}</div>
+        <div class="regime-primary mono">${escapeHtml(primary)}</div>
         <div class="regime-secondary muted tiny">${escapeHtml(c.secondary || "")}</div>
       `;
       host.appendChild(div);
@@ -210,16 +218,18 @@ function fillRegime(snap, history) {
     body.innerHTML = "";
     for (const row of regime.table || []) {
       const tr = document.createElement("tr");
+      let shock = row.shock || "—";
+      if (String(shock).toLowerCase() === "calm") shock = "Calm";
+      if (String(shock).toLowerCase() === "shock") shock = "Shock";
       tr.innerHTML = `
         <td>${escapeHtml(row.series)}</td>
         <td class="mono">${row.vol7d != null ? escapeHtml(String(row.vol7d)) + "%" : "—"}</td>
         <td class="mono">${row.vol30d != null ? escapeHtml(String(row.vol30d)) + "%" : "—"}</td>
-        <td class="mono ${row.shock === "shock" ? "chg-up" : "muted"}">${escapeHtml(row.shock || "—")}</td>
+        <td class="mono ${shock === "Shock" ? "chg-up" : "muted"}">${escapeHtml(shock)}</td>
         <td class="muted tiny">${escapeHtml(row.note || "")}</td>
       `;
       body.appendChild(tr);
     }
-    // peer breadth detail rows
     for (const p of regime.peerRows || []) {
       const tr = document.createElement("tr");
       const align =
@@ -233,33 +243,38 @@ function fillRegime(snap, history) {
     }
   }
   setText("regimeMethod", regime.method || "");
+  return regime;
 }
 
-/** Wire REER/NEER slots from history when present — never invent. */
-async function fillReer() {
-  const hist = await loadHistory();
-  const series = hist.data?.series || {};
-  const neer = series.NEER || series.neer || hist.data?.reer?.NEER;
-  const reer = series.REER || series.reer || hist.data?.reer?.REER;
+function fillEvents(calendar) {
+  const panel = $("eventStripPanel");
+  const host = $("eventStrip");
+  if (!panel || !host) return;
+  const events = calendar?.events || [];
+  if (!events.length) {
+    panel.hidden = true;
+    return;
+  }
+  panel.hidden = false;
+  host.innerHTML = "";
+  const sorted = [...events].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  for (const ev of sorted.slice(-8)) {
+    const div = document.createElement("div");
+    div.className = "event-chip";
+    div.innerHTML = `<span class="mono">${escapeHtml(ev.date || "")}</span> <strong>${escapeHtml(ev.label || ev.id || "")}</strong>`;
+    host.appendChild(div);
+  }
+  setText("eventStripNote", calendar.label || "Curated calendar");
+}
 
-  const setSlot = (valId, noteId, seriesArr, label) => {
-    const el = $(valId);
-    const note = $(noteId);
-    if (!el) return;
-    if (Array.isArray(seriesArr) && seriesArr.length >= 2) {
-      const last = seriesArr[seriesArr.length - 1];
-      el.textContent = typeof last.v === "number" ? String(last.v) : "—";
-      if (note) {
-        note.textContent = `${label} · ${seriesArr[0]?.t || "?"}→${last?.t || "?"} · ${seriesArr.length} pts`;
-      }
-    } else {
-      el.textContent = "—";
-      if (note) note.textContent = "awaiting series — not invented";
-    }
-  };
-
-  setSlot("reerNeer", "reerNeerNote", neer, "NEER");
-  setSlot("reerReer", "reerReerNote", reer, "REER");
+function fillTakeaway(take) {
+  const pre = $("takeawayPre");
+  if (pre) pre.textContent = take.text;
+  const link = $("takeawayNoteLink");
+  if (link && take.asOfDate) {
+    link.href = `/notes/${take.asOfDate}`;
+    link.textContent = `Open as /notes/${take.asOfDate}`;
+  }
 }
 
 function drawBars(canvas, items, { valueKey, labelKey, colorPositive, colorNegative, relative }) {
@@ -344,9 +359,9 @@ function drawCharts(snap) {
   const fxItems = filterDeskFxRows(snap.fx)
     .filter((r) => deskSet.has(String(r.pair || "").replace(/INR$/i, "").toUpperCase()))
     .map((r) => ({
-    label: r.pair?.replace("INR", "") || "?",
-    changePct: r.changePct,
-  }));
+      label: r.pair?.replace("INR", "") || "?",
+      changePct: r.changePct,
+    }));
   const tok = themeTokens();
   drawBars($("fxBars"), fxItems, {
     valueKey: "changePct",
@@ -356,10 +371,13 @@ function drawCharts(snap) {
     relative: false,
   });
 
-  const hardItems = (snap.hardAssets || []).map((r) => ({
-    label: r.id || r.name || "?",
-    inrPrice: r.inrPrice,
-  }));
+  // Gold & oil only — BTC not on this bar chart
+  const hardItems = (snap.hardAssets || [])
+    .filter((r) => ["XAU", "BRENT", "WTI"].includes(String(r.id || "").toUpperCase()))
+    .map((r) => ({
+      label: r.id || r.name || "?",
+      inrPrice: r.inrPrice,
+    }));
   drawBars($("hardBars"), hardItems, {
     valueKey: "inrPrice",
     labelKey: "label",
@@ -369,28 +387,45 @@ function drawCharts(snap) {
   });
 }
 
+function fillImportHorizon(history) {
+  const wrap = $("importHorizon");
+  const note = $("importHorizonNote");
+  if (!wrap) return;
+  const ha = history?.hardAssets || {};
+  const has =
+    (Array.isArray(ha.XAU) && ha.XAU.length >= 2) ||
+    (Array.isArray(ha.BRENT) && ha.BRENT.length >= 2);
+  if (!has) {
+    wrap.hidden = true;
+    return;
+  }
+  wrap.hidden = false;
+  if (note) {
+    note.textContent =
+      "Hard-asset history present — 30/90/365 INR cost windows can be shown when series are sourced.";
+  }
+}
+
 let _resizeBound = null;
 
 /** Render desk tab from snapshot. */
 export async function renderDesk(snap) {
   fillKpis(snap);
-  fillYields(snap);
   fillFxTable(snap.fx);
   fillHardTable(snap.hardAssets);
-  fillStrength(snap.realStrength);
-  fillSourcesAndAssumptions(snap);
-  const hist = await loadHistory();
-  fillRegime(snap, hist.data);
-  fillReer();
-  drawCharts(snap);
+  fillYields(snap);
 
-  // as-of yields cell (shared strip)
-  const y = snap?.yields;
-  const asOfY = document.getElementById("asOfYields");
-  if (asOfY) {
-    asOfY.textContent =
-      y?.asOf && y.us10y != null ? `${y.asOf} · 10y ${Number(y.us10y).toFixed(2)}%` : "—";
-  }
+  const [hist, ev] = await Promise.all([loadHistory(), loadEvents()]);
+  const regime = fillRegime(snap, hist.data);
+  const strength = buildRealStrengthBlurb(snap, regime);
+  fillStrength(strength);
+  const slip = buildSlipSummaryFlags(snap, hist.data);
+  fillSlipFlags(slip);
+  const take = buildDailyTakeaway(snap, hist.data, regime, slip);
+  fillTakeaway(take);
+  fillEvents(ev.data);
+  fillImportHorizon(hist.data);
+  drawCharts(snap);
 
   if (_resizeBound) window.removeEventListener("resize", _resizeBound);
   _resizeBound = () => drawCharts(snap);

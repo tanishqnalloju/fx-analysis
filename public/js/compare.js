@@ -1,6 +1,6 @@
 /**
  * Compare tab — <select> dropdown of full FX universe + key-basket legs.
- * Deep-link via #compare or #compare/USD (hash only; no /compare HTML routes).
+ * Deep-link via /compare or /compare/USD (path routes; defaults to USD).
  */
 import {
   buildCompare,
@@ -578,8 +578,7 @@ function fillTechnicals(techBundle) {
   }
 }
 
-function fillModelCard(model) {
-  const body = $("cmpModelBody");
+function
   if (!body) return;
   body.innerHTML = "";
   if (!model?.rules?.length) {
@@ -653,15 +652,8 @@ export async function renderCompare(snap, code, onPick) {
   const view = $("compareView");
   const hint = $("compareHint");
 
-  if (!code) {
-    if (view) view.hidden = true;
-    if (hint) {
-      hint.textContent =
-        "Select a currency or hard asset from the dropdown. Legs use the key basket only.";
-    }
-    setText("cmpStatus", "Pick a code to compare");
-    return;
-  }
+  // Never leave Compare on an empty pick-a-code dead end — default USD
+  if (!code) code = "USD";
 
   const result = await loadCompare(code, snap);
   if (result.error === "not_found") {
@@ -688,7 +680,7 @@ export async function renderCompare(snap, code, onPick) {
   if (view) view.hidden = false;
   setText(
     "cmpStatus",
-    `Compare ${data.code} via ${result.via}${data.live ? " · live overlay" : ""} · ${data.asOf || ""} · ${data.legs?.length || 0} key-basket legs`
+    `Compare ${data.code} via ${result.via} · ${data.asOf || ""} · ${data.legs?.length || 0} key-basket legs`
   );
 
   fillKpis(data);
@@ -708,7 +700,6 @@ export async function renderCompare(snap, code, onPick) {
       ? histLoaded.data?.series?.USDINR
       : histLoaded.data?.series?.[`${data.code}INR`];
   const model = buildModelCard(modelSeries || [], data.code === "INR" ? "USDINR" : `${data.code}INR`);
-  fillModelCard(model);
   const ll = buildLeadLag(histLoaded.data);
   fillLeadLag(ll);
   const selVol = buildSelectedRegime(histLoaded.data, data.code);

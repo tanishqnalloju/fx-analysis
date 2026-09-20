@@ -262,6 +262,38 @@ if (snap.yields) {
   }
 }
 
+
+// Public rewrite checks
+const takeawayPath = join(root, "public/js/takeaway.js");
+if (!existsSync(takeawayPath)) fail("public/js/takeaway.js missing");
+const { buildDailyTakeaway, buildRealStrengthBlurb, buildSlipSummaryFlags, filterAsiaPeerRows } = await import(
+  pathToFileURL(takeawayPath).href
+);
+const regimeForTake = history ? buildRegime(snap, history) : { shock: false, breadthLabel: "mixed", breadthPct: null };
+const slipSum = buildSlipSummaryFlags(snap, history);
+const take = buildDailyTakeaway(snap, history, regimeForTake, slipSum);
+if (!take.text.includes("INR takeaway ·")) fail("takeaway missing header");
+if (!take.text.includes("Research commentary only — not RBI REER")) fail("takeaway missing integrity line");
+if (!/\bCalm\b|\bShock\b/.test(take.text)) fail("takeaway must spell Calm|Shock");
+const blurb = buildRealStrengthBlurb(snap, regimeForTake);
+if (!["STRONGER", "WEAKER", "MIXED"].includes(blurb.label)) fail(`bad strength label ${blurb.label}`);
+if (!blurb.sentence1 || !blurb.sentence2) fail("real-strength needs two sentences");
+const asia = filterAsiaPeerRows(snap.fx);
+console.log(`  asia peers in snapshot: ${asia.map((r) => r.pair).join(",") || "(none)"}`);
+
+const idx = readFileSync(join(root, "public/index.html"), "utf8");
+if (idx.includes("reerPanel")) fail("REER panel must be hidden from public index");
+if (/KV CRON|asOfCron/i.test(idx)) fail("public index must not expose KV CRON");
+if (idx.includes("cmpModelTable")) fail("KEEP/WEAK/KILL must not be on Compare panel");
+if (!idx.includes("howModelTable")) fail("/how must host model card");
+if (!existsSync(join(root, "public/sitemap.xml"))) fail("sitemap.xml missing");
+if (!existsSync(join(root, "public/js/home.js"))) fail("home.js missing");
+if (!existsSync(join(root, "public/js/how.js"))) fail("how.js missing");
+
+const utilSrc = readFileSync(join(root, "public/js/util.js"), "utf8");
+if (!utilSrc.includes("parseRoute") || !utilSrc.includes("pathFor")) fail("util.js must export path routing");
+
+
 console.log(`validate ok: ${path}`);
 console.log(`  asOf=${snap.asOf} fx=${snap.fx.length} hard=${snap.hardAssets.length} scriptures=${snap.scriptures.length}`);
 console.log(`  compare selectable=${codes.length} codes smoke=ok`);

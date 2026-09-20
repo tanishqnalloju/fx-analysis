@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fx-analysis.tanishqnalloju.com/sitemap.xml
