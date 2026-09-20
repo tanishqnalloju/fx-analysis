@@ -578,7 +578,8 @@ function fillTechnicals(techBundle) {
   }
 }
 
-function
+function fillModelCard(model) {
+  const body = $("cmpModelBody");
   if (!body) return;
   body.innerHTML = "";
   if (!model?.rules?.length) {
