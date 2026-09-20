@@ -1206,10 +1206,25 @@ function injectMeta(html, { view, code, canonical }) {
 
 async function serveSpa(env, request, info) {
   if (!env.ASSETS) return json({ error: "assets unavailable" }, 503);
-  const assetUrl = new URL("/index.html", request.url);
-  const res = await env.ASSETS.fetch(new Request(assetUrl, request));
-  if (!res.ok) return res;
+  // Fetch the SPA shell via "/" — ASSETS 307s /index.html → / (pretty URL).
+  const shellReq = new Request(new URL("/", request.url), {
+    method: "GET",
+    headers: { Accept: "text/html" },
+    redirect: "follow",
+  });
+  let res = await env.ASSETS.fetch(shellReq);
+  // If assets still redirects, follow once manually
+  if (res.status >= 300 && res.status < 400 && res.headers.get("Location")) {
+    const loc = new URL(res.headers.get("Location"), request.url);
+    res = await env.ASSETS.fetch(new Request(loc, { method: "GET", headers: { Accept: "text/html" } }));
+  }
+  if (!res.ok) {
+    return json({ error: "spa shell unavailable", status: res.status }, 503);
+  }
   const html = await res.text();
+  if (!html || !html.includes("<!DOCTYPE html") && !html.includes("<html")) {
+    return json({ error: "spa shell empty" }, 503);
+  }
   const body = injectMeta(html, info);
   return new Response(body, {
     status: 200,

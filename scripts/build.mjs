@@ -79,6 +79,10 @@ if (!wrangler.includes('"/desk"') || !wrangler.includes('"/how"') || !wrangler.i
   console.error("build FAIL: run_worker_first must include SPA paths /, /desk, /compare, /slip, /how");
   process.exit(1);
 }
+if (!wrangler.includes("single-page-application")) {
+  console.error("build FAIL: assets.not_found_handling must be single-page-application");
+  process.exit(1);
+}
 if (!/"routes"\s*:\s*\[\s*\]/.test(wrangler)) {
   console.error("build FAIL: routes must be [] (custom domain via Workers Domains API)");
   process.exit(1);
