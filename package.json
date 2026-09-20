@@ -1,0 +1,25 @@
+{
+  "name": "fx-analysis",
+  "version": "1.6.0",
+  "private": true,
+  "type": "module",
+  "description": "FX Analysis \u00b7 INR real-strength \u2014 Worker cron+KV source of truth, Desk/Compare/Slip",
+  "scripts": {
+    "refresh": "node scripts/refresh.mjs",
+    "build": "node scripts/build.mjs",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "validate": "node scripts/validate.mjs",
+    "check": "node scripts/check.mjs",
+    "seed-kv": "node scripts/seed-kv.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.34.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "lightweight-charts": "^5.2.1"
+  }
+}

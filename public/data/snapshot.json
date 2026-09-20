@@ -1,0 +1,1574 @@
+{
+  "asOf": "2026-09-15T00:00:00Z",
+  "timezoneNote": "UTC; Frankfurter/ECB reference date 2026-09-15; refresh 2026-09-16T05:45:47.474Z",
+  "live": false,
+  "fx": [
+    {
+      "pair": "USDINR",
+      "rate": 95.96,
+      "changePct": 0.4186,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 USD",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "EURINR",
+      "rate": 110.7278,
+      "changePct": 0.3143,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 EUR",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "GBPINR",
+      "rate": 129.3854,
+      "changePct": 0.3346,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 GBP",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "JPYINR",
+      "rate": 0.619097,
+      "changePct": 0.127,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 JPY (not per-100)",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "CNYINR",
+      "rate": 14.2978,
+      "changePct": 0.3722,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 CNY",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "AUDINR",
+      "rate": 68.3768,
+      "changePct": 0.3613,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 AUD",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "BRLINR",
+      "rate": 18.6287,
+      "changePct": 0.5239,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 BRL",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "CADINR",
+      "rate": 68.9368,
+      "changePct": 0.1805,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 CAD",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "CHFINR",
+      "rate": 117.2847,
+      "changePct": 0.2087,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 CHF",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "CZKINR",
+      "rate": 4.55824,
+      "changePct": 0.3232,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 CZK",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "DKKINR",
+      "rate": 14.8128,
+      "changePct": 0.3163,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 DKK",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "HKDINR",
+      "rate": 12.2328,
+      "changePct": 0.4045,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 HKD",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "HUFINR",
+      "rate": 0.302513,
+      "changePct": 0.1242,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 HUF",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "IDRINR",
+      "rate": 0.005422,
+      "changePct": 0.2086,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 IDR",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "ILSINR",
+      "rate": 31.5523,
+      "changePct": 0.8181,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 ILS",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "ISKINR",
+      "rate": 0.790901,
+      "changePct": 0.1703,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 ISK",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "KRWINR",
+      "rate": 0.070603,
+      "changePct": -0.5352,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 KRW",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "MXNINR",
+      "rate": 5.59312,
+      "changePct": -0.0772,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 MXN",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "MYRINR",
+      "rate": 23.4793,
+      "changePct": 0.1483,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 MYR",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "NOKINR",
+      "rate": 10.2668,
+      "changePct": 0.1468,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 NOK",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "NZDINR",
+      "rate": 55.2479,
+      "changePct": 0.1642,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 NZD",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "PHPINR",
+      "rate": 1.52798,
+      "changePct": 0.5241,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 PHP",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "PLNINR",
+      "rate": 25.5131,
+      "changePct": 0.3545,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 PLN",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "RONINR",
+      "rate": 21.0402,
+      "changePct": 0.2006,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 RON",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "SEKINR",
+      "rate": 9.8216,
+      "changePct": 0.3775,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 SEK",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "SGDINR",
+      "rate": 75.4106,
+      "changePct": 0.2608,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 SGD",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "THBINR",
+      "rate": 2.88211,
+      "changePct": 0.2829,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 THB",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "TRYINR",
+      "rate": 1.97286,
+      "changePct": 0.3835,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 TRY",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "ZARINR",
+      "rate": 5.89681,
+      "changePct": 0.2705,
+      "source": "Frankfurter / ECB reference",
+      "note": "INR per 1 ZAR",
+      "available": true,
+      "provider": "frankfurter"
+    },
+    {
+      "pair": "PGKINR",
+      "rate": 21.5226,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 PGK · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "TWDINR",
+      "rate": 3.01367,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 TWD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "VNDINR",
+      "rate": 0.00369,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 VND · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "AEDINR",
+      "rate": 26.1198,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 AED · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "QARINR",
+      "rate": 26.3503,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 QAR · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "SARINR",
+      "rate": 25.5735,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 SAR · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "CLPINR",
+      "rate": 0.100189,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 CLP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "UAHINR",
+      "rate": 2.14865,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 UAH · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "EGPINR",
+      "rate": 1.84645,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 EGP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MDLINR",
+      "rate": 5.52381,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MDL · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "RSDINR",
+      "rate": 0.943531,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 RSD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "RUBINR",
+      "rate": 1.14147,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 RUB · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "AZNINR",
+      "rate": 56.4291,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 AZN · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "BDTINR",
+      "rate": 0.778173,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 BDT · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "DZDINR",
+      "rate": 0.717959,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 DZD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "GELINR",
+      "rate": 36.8487,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 GEL · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "KZTINR",
+      "rate": 0.213713,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 KZT · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "TNDINR",
+      "rate": 32.8017,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 TND · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "JODINR",
+      "rate": 135.3007,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 JOD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "XAFINR",
+      "rate": 0.168746,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 XAF · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "XOFINR",
+      "rate": 0.168746,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 XOF · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "BYNINR",
+      "rate": 31.6171,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 BYN · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "PKRINR",
+      "rate": 0.34567,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 PKR · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "AFNINR",
+      "rate": 1.48708,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 AFN · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "ALLINR",
+      "rate": 1.20604,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 ALL · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "AMDINR",
+      "rate": 0.263899,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 AMD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "AOAINR",
+      "rate": 0.104211,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 AOA · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "ARSINR",
+      "rate": 0.063628,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 ARS · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "AWGINR",
+      "rate": 53.5899,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 AWG · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "BAMINR",
+      "rate": 56.5949,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 BAM · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "BBDINR",
+      "rate": 47.9634,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 BBD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "BHDINR",
+      "rate": 255.046,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 BHD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "BIFINR",
+      "rate": 0.031903,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 BIF · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "BNDINR",
+      "rate": 75.3865,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 BND · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "BOBINR",
+      "rate": 8.72853,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 BOB · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "BSDINR",
+      "rate": 95.9268,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 BSD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "BWPINR",
+      "rate": 6.9355,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 BWP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "BZDINR",
+      "rate": 47.9634,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 BZD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "CDFINR",
+      "rate": 0.042383,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 CDF · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "COPINR",
+      "rate": 0.030878,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 COP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "CRCINR",
+      "rate": 0.21463,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 CRC · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "CUPINR",
+      "rate": 3.99695,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 CUP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "CVEINR",
+      "rate": 1.00385,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 CVE · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "DJFINR",
+      "rate": 0.539761,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 DJF · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "DOPINR",
+      "rate": 1.62549,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 DOP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "ERNINR",
+      "rate": 6.23711,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 ERN · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "ETBINR",
+      "rate": 0.590051,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 ETB · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "FJDINR",
+      "rate": 43.0232,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 FJD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "GHSINR",
+      "rate": 8.35882,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 GHS · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "GIPINR",
+      "rate": 129.3409,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 GIP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "GMDINR",
+      "rate": 1.32293,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 GMD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "GNFINR",
+      "rate": 0.010921,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 GNF · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "GTQINR",
+      "rate": 12.5711,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 GTQ · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "GYDINR",
+      "rate": 0.458497,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 GYD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "HNLINR",
+      "rate": 3.56998,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 HNL · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "HTGINR",
+      "rate": 0.735539,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 HTG · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "IQDINR",
+      "rate": 0.073227,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 IQD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "JMDINR",
+      "rate": 0.607871,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 JMD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "KESINR",
+      "rate": 0.740318,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 KES · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "KGSINR",
+      "rate": 1.09694,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 KGS · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "KHRINR",
+      "rate": 0.023679,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 KHR · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "KMFINR",
+      "rate": 0.224994,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 KMF · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "KWDINR",
+      "rate": 311.6272,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 KWD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "KYDINR",
+      "rate": 116.9837,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 KYD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "LBPINR",
+      "rate": 0.001072,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 LBP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "LKRINR",
+      "rate": 0.291284,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 LKR · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "LRDINR",
+      "rate": 0.552161,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 LRD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "LSLINR",
+      "rate": 5.89476,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 LSL · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "LYDINR",
+      "rate": 15.1263,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 LYD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MADINR",
+      "rate": 10.1216,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MAD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MGAINR",
+      "rate": 0.022069,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MGA · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MKDINR",
+      "rate": 1.79604,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MKD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MMKINR",
+      "rate": 0.045679,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MMK · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MNTINR",
+      "rate": 0.026679,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MNT · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MOPINR",
+      "rate": 11.8723,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MOP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MRUINR",
+      "rate": 2.3934,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MRU · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MURINR",
+      "rate": 2.03402,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MUR · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MVRINR",
+      "rate": 6.22095,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MVR · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MWKINR",
+      "rate": 0.055364,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MWK · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "MZNINR",
+      "rate": 1.50129,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 MZN · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "NADINR",
+      "rate": 5.89476,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 NAD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "NGNINR",
+      "rate": 0.072327,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 NGN · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "NIOINR",
+      "rate": 2.60595,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 NIO · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "NPRINR",
+      "rate": 0.624782,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 NPR · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "OMRINR",
+      "rate": 249.4703,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 OMR · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "PABINR",
+      "rate": 95.9268,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 PAB · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "PENINR",
+      "rate": 28.4925,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 PEN · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "PYGINR",
+      "rate": 0.016044,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 PYG · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "RWFINR",
+      "rate": 0.065196,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 RWF · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "SBDINR",
+      "rate": 11.9429,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 SBD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "SCRINR",
+      "rate": 6.5381,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 SCR · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "SDGINR",
+      "rate": 0.15982,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 SDG · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "SOSINR",
+      "rate": 0.167851,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 SOS · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "SRDINR",
+      "rate": 2.54366,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 SRD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "SSPINR",
+      "rate": 0.01695,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 SSP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "STNINR",
+      "rate": 4.51796,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 STN · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "SVCINR",
+      "rate": 10.9631,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 SVC · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "SZLINR",
+      "rate": 5.89476,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 SZL · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "TJSINR",
+      "rate": 10.3757,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 TJS · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "TMTINR",
+      "rate": 27.4073,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 TMT · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "TOPINR",
+      "rate": 40.6157,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 TOP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "TTDINR",
+      "rate": 14.1923,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 TTD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "TZSINR",
+      "rate": 0.036283,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 TZS · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "UGXINR",
+      "rate": 0.024566,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 UGX · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "UYUINR",
+      "rate": 2.38631,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 UYU · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "UZSINR",
+      "rate": 0.008153,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 UZS · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "VESINR",
+      "rate": 0.114042,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 VES · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "VUVINR",
+      "rate": 0.8169,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 VUV · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "WSTINR",
+      "rate": 35.283,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 WST · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "XCDINR",
+      "rate": 35.5288,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 XCD · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "XCGINR",
+      "rate": 53.5899,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 XCG · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "XPFINR",
+      "rate": 0.927582,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 XPF · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "YERINR",
+      "rate": 0.40479,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 YER · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "ZMWINR",
+      "rate": 4.92393,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 ZMW · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "IRRINR",
+      "rate": 0.00007,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 IRR · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "LAKINR",
+      "rate": 0.004291,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 LAK · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    },
+    {
+      "pair": "SYPINR",
+      "rate": 0.785617,
+      "changePct": null,
+      "source": "FloatRates (extra; not on ECB/Frankfurter)",
+      "note": "INR per 1 SYP · FloatRates only (not ECB)",
+      "available": true,
+      "provider": "floatrates",
+      "notOnEcb": true
+    }
+  ],
+  "hardAssets": [
+    {
+      "id": "XAU",
+      "name": "Gold",
+      "unit": "USD/oz",
+      "usdPrice": 4293,
+      "inrPrice": 411956.28,
+      "changePct": null,
+      "source": "ActionForex / investingLive Mon session (~4292–4340 range); mid ~4293 · INR recomputed × USDINR 95.56 (Frankfurter 2026-09-14) · INR recomputed × USDINR 95.56 (Frankfurter 2026-09-14) · INR recomputed × USDINR 95.96 (Frankfurter 2026-09-15)"
+    },
+    {
+      "id": "BRENT",
+      "name": "Brent crude",
+      "unit": "USD/bbl",
+      "usdPrice": 108,
+      "inrPrice": 10363.68,
+      "changePct": 3,
+      "source": "Session print ~108 USD/bbl (+~3%); INR = USD × USDINR 95.75 · INR recomputed × USDINR 95.56 (Frankfurter 2026-09-14) · INR recomputed × USDINR 95.56 (Frankfurter 2026-09-14) · INR recomputed × USDINR 95.96 (Frankfurter 2026-09-15)"
+    },
+    {
+      "id": "WTI",
+      "name": "WTI crude",
+      "unit": "USD/bbl",
+      "usdPrice": 103,
+      "inrPrice": 9883.88,
+      "changePct": null,
+      "source": "Session print ~103 USD/bbl; INR = USD × USDINR 95.75 · INR recomputed × USDINR 95.56 (Frankfurter 2026-09-14) · INR recomputed × USDINR 95.56 (Frankfurter 2026-09-14) · INR recomputed × USDINR 95.96 (Frankfurter 2026-09-15)"
+    },
+    {
+      "id": "BTC",
+      "name": "Bitcoin",
+      "unit": "USD",
+      "usdPrice": 75890.89,
+      "inrPrice": 7282489.8,
+      "changePct": -2.3912,
+      "source": "Coinbase spot BTC-USD (2026-09-16T05:45:46.630Z)"
+    }
+  ],
+  "yields": {
+    "asOf": "2026-09-15",
+    "us2y": 4.67,
+    "us10y": 5,
+    "us10yMinus2y": 0.33,
+    "source": "U.S. Treasury Daily Treasury Yield Curve Rates (home.treasury.gov)"
+  },
+  "realStrength": {
+    "summary": "ECB/Frankfurter USDINR 95.96 as-of 2026-09-15 covering 29 FX codes + 117 FloatRates extras. Session vs prior ECB day: 27 pairs higher INR/foreign (softer INR), 2 lower. Brent 108 USD/bbl → ₹10363.68/bbl via USDINR. Gold 4293 USD/oz → ₹411956.28/oz. BTC 75890.89 USD → ₹7282489.8.",
+    "legs": [
+      {
+        "lens": "FX basket (Frankfurter/ECB · 29 codes)",
+        "verdict": "weaker",
+        "detail": "USDINR 95.96. Higher XXXINR = weaker INR in FX terms. History: 28 ECB business days baked."
+      },
+      {
+        "lens": "Gold (XAU)",
+        "verdict": "mixed",
+        "detail": "Gold 4293 USD/oz carried from prior validated print; INR recomputed. No multi-day gold history invented."
+      },
+      {
+        "lens": "Oil (Brent / WTI)",
+        "verdict": "weaker",
+        "detail": "Brent/WTI USD prints carried from prior; INR barrel cost = usd × USDINR. No multi-day oil history invented."
+      },
+      {
+        "lens": "BTC",
+        "verdict": "mixed",
+        "detail": "BTC 75890.89 USD (Coinbase spot BTC-USD (2026-09-16T05:45:46.630Z)). INR = USD × USDINR."
+      }
+    ]
+  },
+  "scriptures": [
+    "Frankfurter/ECB currencies: AUD, BRL, CAD, CHF, CNY, CZK, DKK, EUR, GBP, HKD, HUF, IDR, ILS, INR, ISK, JPY, KRW, MXN, MYR, NOK, NZD, PHP, PLN, RON, SEK, SGD, THB, TRY, USD, ZAR (30) — https://api.frankfurter.app/currencies",
+    "Frankfurter/ECB latest from USD as-of 2026-09-15: USDINR 95.96; 29 INR-cross pairs",
+    "Frankfurter/ECB timeseries 2026-08-07..2026-09-15: 28 business days stored in history.json",
+    "FloatRates extras (not on ECB): PGK, TWD, VND, AED, QAR, SAR, CLP, UAH, EGP, MDL, RSD, RUB, AZN, BDT, DZD, GEL, KZT, TND, JOD, XAF, XOF, BYN, PKR, AFN, ALL, AMD, AOA, ARS, AWG, BAM, BBD, BHD, BIF, BND, BOB, BSD, BWP, BZD, CDF, COP, CRC, CUP, CVE, DJF, DOP, ERN, ETB, FJD, GHS, GIP, GMD, GNF, GTQ, GYD, HNL, HTG, IQD, JMD, KES, KGS, KHR, KMF, KWD, KYD, LBP, LKR, LRD, LSL, LYD, MAD, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MZN, NAD, NGN, NIO, NPR, OMR, PAB, PEN, PYG, RWF, SBD, SCR, SDG, SOS, SRD, SSP, STN, SVC, SZL, TJS, TMT, TOP, TTD, TZS, UGX, UYU, UZS, VES, VUV, WST, XCD, XCG, XPF, YER, ZMW, IRR, LAK, SYP",
+    "Gold 4293 USD/oz — prior snapshot retained; INR recomputed",
+    "Brent 108 / WTI 103 USD/bbl — prior snapshot retained; INR recomputed",
+    "BTC 75890.89 USD — Coinbase spot BTC-USD (2026-09-16T05:45:46.630Z)",
+    "INR hard-asset prices = usdPrice × USDINR (same session FX)",
+    "Live overlay: Worker fetches Frankfurter latest?from=USD (all rates) and converts to INR pairs",
+    "UST yields 2y 4.67% / 10y 5% / curve 0.33% as-of 2026-09-15 — U.S. Treasury Daily Treasury Yield Curve Rates (home.treasury.gov)"
+  ],
+  "assumptions": [
+    "Prefer Frankfurter/ECB when a code exists in both Frankfurter and FloatRates",
+    "FloatRates extras are labeled notOnEcb — never treated as ECB reference",
+    "Hard-asset multi-day history is not invented; charts show “level only / no history yet” when absent",
+    "AED and other non-ECB codes appear only if FloatRates (or another sourced feed) succeeds",
+    "changePct for Frankfurter pairs is prior ECB business day → latest; FloatRates extras have null changePct unless sourced",
+    "realStrength is narrative desk commentary, not a formal PPP or REER index",
+    "Higher USDINR / XXXINR means weaker INR in FX terms",
+    "US Treasury yields from official CSV when fetch succeeds; never invented",
+    "refresh note: FloatRates extras merged: 117 codes not on Frankfurter/ECB",
+    "refresh note: treasury 202608: 21 rows",
+    "refresh note: treasury 202609: 10 rows"
+  ],
+  "meta": {
+    "frankfurterCodes": [
+      "AUD",
+      "BRL",
+      "CAD",
+      "CHF",
+      "CNY",
+      "CZK",
+      "DKK",
+      "EUR",
+      "GBP",
+      "HKD",
+      "HUF",
+      "IDR",
+      "ILS",
+      "INR",
+      "ISK",
+      "JPY",
+      "KRW",
+      "MXN",
+      "MYR",
+      "NOK",
+      "NZD",
+      "PHP",
+      "PLN",
+      "RON",
+      "SEK",
+      "SGD",
+      "THB",
+      "TRY",
+      "USD",
+      "ZAR"
+    ],
+    "frankfurterCount": 30,
+    "floatRatesExtras": 117,
+    "historyDays": 28,
+    "historyFrom": "2026-08-07",
+    "historyTo": "2026-09-15",
+    "skipped": [],
+    "unavailableExamples": []
+  }
+}

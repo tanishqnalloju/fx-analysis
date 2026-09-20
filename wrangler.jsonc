@@ -1,0 +1,27 @@
+// FX Analysis Worker — custom domain via Workers Domains API (not routes)
+// hostname: fx-analysis.tanishqnalloju.com · keep inr-dash untouched
+{
+  "name": "fx-analysis",
+  "account_id": "2161e11f506e6d2afde89f05a6f438eb",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": false,
+  "routes": [],
+  "kv_namespaces": [
+    {
+      "binding": "DATA",
+      "id": "05be48d5b28d447d950d2b614e749df6"
+    }
+  ],
+  "triggers": {
+    // 03:30 UTC daily ≈ after ECB reference / before IST morning (~09:00 IST)
+    "crons": ["30 3 * * *"]
+  },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  }
+}

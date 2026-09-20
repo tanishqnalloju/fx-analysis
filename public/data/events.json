@@ -1,0 +1,16 @@
+{
+  "label": "ASSUMPTION · manual calendar",
+  "note": "Curated starter set for chart markers — not an official economic calendar. Dates are approximate policy/event days; verify before research use.",
+  "events": [
+    { "date": "2026-08-07", "id": "rbi-aug", "label": "RBI MPC", "kind": "rbi", "note": "ASSUMPTION · approximate policy window" },
+    { "date": "2026-07-30", "id": "fomc-jul", "label": "FOMC", "kind": "fomc", "note": "ASSUMPTION · Fed decision window" },
+    { "date": "2026-06-18", "id": "fomc-jun", "label": "FOMC", "kind": "fomc", "note": "ASSUMPTION · Fed decision window" },
+    { "date": "2026-06-06", "id": "rbi-jun", "label": "RBI MPC", "kind": "rbi", "note": "ASSUMPTION · approximate policy window" },
+    { "date": "2026-05-07", "id": "fomc-may", "label": "FOMC", "kind": "fomc", "note": "ASSUMPTION · Fed decision window" },
+    { "date": "2026-04-09", "id": "rbi-apr", "label": "RBI MPC", "kind": "rbi", "note": "ASSUMPTION · approximate policy window" },
+    { "date": "2026-03-19", "id": "fomc-mar", "label": "FOMC", "kind": "fomc", "note": "ASSUMPTION · Fed decision window" },
+    { "date": "2026-02-06", "id": "rbi-feb", "label": "RBI MPC", "kind": "rbi", "note": "ASSUMPTION · approximate policy window" },
+    { "date": "2025-10-07", "id": "oil-geo", "label": "Oil shock watch", "kind": "oil", "note": "ASSUMPTION · geopolitical oil risk marker" },
+    { "date": "2025-04-02", "id": "oil-opec", "label": "OPEC+ watch", "kind": "oil", "note": "ASSUMPTION · supply-side oil marker" }
+  ]
+}
