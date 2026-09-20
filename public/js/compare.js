@@ -2,6 +2,8 @@
  * Compare tab — <select> dropdown of full FX universe + key-basket legs.
  * Deep-link via /compare or /compare/USD (path routes; defaults to USD).
  */
+/* asset-bust: hydrate-fix e45ca24 */
+
 import {
   buildCompare,
   majorPickerCodes,
