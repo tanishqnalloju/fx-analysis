@@ -81,19 +81,36 @@ export function setText(id, text) {
   if (el) el.textContent = text ?? "—";
 }
 
-export async function loadSnapshot() {
+/** Fetch JSON with a hard timeout so hydration cannot hang forever. */
+async function fetchJsonTimed(url, ms = 4000) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
   try {
-    const res = await fetch("/api/snapshot", { cache: "no-store" });
+    const res = await fetch(url, { cache: "no-store", signal: ctrl.signal });
+    return res;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export async function loadSnapshot() {
+  // Prefer live API; race with 4s timeout, then fall back to baked snapshot.
+  try {
+    const res = await fetchJsonTimed("/api/snapshot", 4000);
     if (res.ok) {
       const data = await res.json();
       if (data && !data.error) return { data, via: "api" };
     }
   } catch {
-    /* fall through */
+    /* fall through to baked */
   }
-  const res = await fetch("/data/snapshot.json", { cache: "no-store" });
-  if (!res.ok) throw new Error(`snapshot fetch failed (${res.status})`);
-  return { data: await res.json(), via: "baked" };
+  try {
+    const res = await fetchJsonTimed("/data/snapshot.json", 4000);
+    if (!res.ok) throw new Error(`snapshot fetch failed (${res.status})`);
+    return { data: await res.json(), via: "baked" };
+  } catch (err) {
+    throw new Error(`snapshot unavailable: ${err?.message || err}`);
+  }
 }
 
 let _historyCache = null;

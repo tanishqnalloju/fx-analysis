@@ -3,6 +3,7 @@
  * Assert critical project files exist (path-routed SPA).
  */
 import { existsSync, readFileSync, copyFileSync, mkdirSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -202,6 +203,33 @@ const appJs = readFileSync(join(root, "public/js/app.js"), "utf8");
 if (!appJs.includes("parseRoute") || !appJs.includes("setPath")) {
   console.error("build FAIL: app.js must use path routing (parseRoute/setPath)");
   process.exit(1);
+}
+// Critical path must not statically pull compare/slip/charts/LWC — a SyntaxError
+// there previously stuck the whole SPA on "Loading board snapshot…".
+if (/^import\s+.*from\s+["']\.\/compare\.js["']/m.test(appJs) ||
+    /^import\s+.*from\s+["']\.\/slip\.js["']/m.test(appJs) ||
+    /^import\s+.*from\s+["']\.\/charts\.js["']/m.test(appJs)) {
+  console.error("build FAIL: app.js must dynamic-import compare/slip/charts (not static)");
+  process.exit(1);
+}
+if (!appJs.includes('import("./compare.js")') || !appJs.includes('import("./slip.js")')) {
+  console.error("build FAIL: app.js must dynamic-import ./compare.js and ./slip.js");
+  process.exit(1);
+}
+if (!appJs.includes("Failed to load snapshot") || !appJs.includes("loadStatus")) {
+  console.error("build FAIL: app.js must surface load failures on #loadStatus");
+  process.exit(1);
+}
+
+// Syntax-check every public JS module so a corrupted upload cannot ship.
+const jsModules = required.filter((rel) => rel.startsWith("public/js/") && rel.endsWith(".js"));
+for (const rel of jsModules) {
+  const r = spawnSync(process.execPath, ["--check", join(root, rel)], { encoding: "utf8" });
+  if (r.status !== 0) {
+    console.error(`build FAIL: syntax error in ${rel}`);
+    console.error(r.stderr || r.stdout);
+    process.exit(1);
+  }
 }
 
 const takeaway = readFileSync(join(root, "public/js/takeaway.js"), "utf8");
