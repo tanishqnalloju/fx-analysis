@@ -1,7 +1,14 @@
 node_modules/
 .wrangler/
-dist/
+.dev.vars
 .env
 .env.*
-*.log
+!.env.example
+*.pem
+*.key
 .DS_Store
+dist/
+.cache/
+# local secrets / box paths — never commit
+box-secrets.json
+**/box-secrets.json
